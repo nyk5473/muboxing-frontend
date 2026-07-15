@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Muboxing - AI Music Tutor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fredoka:wght@600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "primary": "#4c5a9d",
+                    "glass-border": "rgba(255, 255, 255, 0.5)",
+                    "on-secondary-container": "#782e3f",
+                    "on-primary-fixed-variant": "#334283",
+                    "secondary-fixed-dim": "#ffb2be",
+                    "kitsch-red": "#E44C34",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#364486",
+                    "tertiary-container": "#d9b550",
+                    "on-background": "#1b1b20",
+                    "surface-container-high": "#e9e7ed",
+                    "primary-fixed": "#dde1ff",
+                    "surface-container-highest": "#e4e1e8",
+                    "on-secondary-fixed-variant": "#782d3f",
+                    "inverse-on-surface": "#f2f0f6",
+                    "surface-bright": "#fbf8ff",
+                    "outline": "#767681",
+                    "on-tertiary": "#ffffff",
+                    "surface-container": "#efedf3",
+                    "surface-variant": "#e4e1e8",
+                    "on-surface-variant": "#454650",
+                    "soft-blue": "#D2FFFF",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#dbd9df",
+                    "secondary-fixed": "#ffd9de",
+                    "on-surface": "#1b1b20",
+                    "on-error-container": "#93000a",
+                    "lavender-mist": "#C3C9FF",
+                    "on-tertiary-fixed-variant": "#584400",
+                    "surface-container-low": "#f5f2f9",
+                    "secondary": "#954456",
+                    "primary-fixed-dim": "#b9c3ff",
+                    "inverse-surface": "#303035",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#001257",
+                    "on-error": "#ffffff",
+                    "accent-yellow": "#F4CE42",
+                    "tertiary-fixed": "#ffe08f",
+                    "tertiary": "#755b00",
+                    "primary-container": "#a7b5ff",
+                    "on-tertiary-container": "#5b4700",
+                    "background": "#fbf8ff",
+                    "surface": "#fbf8ff",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed": "#3f0115",
+                    "surface-tint": "#4c5a9d",
+                    "glass-white": "rgba(255, 255, 255, 0.4)",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#241a00",
+                    "secondary-container": "#fd99ab",
+                    "tertiary-fixed-dim": "#e8c35c",
+                    "outline-variant": "#c6c5d2",
+                    "inverse-primary": "#b9c3ff"
+                },
+                "fontFamily": {
+                    "caption-sm": ["Outfit", "sans-serif"],
+                    "display-lg": ["Fredoka", "sans-serif"],
+                    "headline-lg-mobile": ["Fredoka", "sans-serif"],
+                    "headline-lg": ["Fredoka", "sans-serif"],
+                    "label-md": ["Outfit", "Noto Sans KR", "sans-serif"],
+                    "body-md": ["Outfit", "Noto Sans KR", "sans-serif"],
+                    "mono": ["JetBrains Mono", "monospace"]
+                },
+                "animation": {
+                    "float": "float 4s ease-in-out infinite alternate",
+                    "pop-in": "popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+                    "spin-slow": "spin 4s linear infinite",
+                    "slide-down": "slideDown 0.4s ease forwards"
+                },
+                "keyframes": {
+                    "float": { "0%": { transform: "translateY(0)" }, "100%": { transform: "translateY(-10px)" } },
+                    "popIn": { "0%": { opacity: "0", transform: "scale(0.95) translateY(10px)" }, "100%": { opacity: "1", transform: "scale(1) translateY(0)" } },
+                    "slideDown": { "0%": { opacity: "0", transform: "translateY(-10px)" }, "100%": { opacity: "1", transform: "translateY(0)" } }
+                }
+            }
+        }
+    }
+</script>
+<style>
+    body {
+        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+        background-attachment: fixed;
+        min-height: 100vh;
+        color: #1b1b20;
+    }
+    
+    .light-lines {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background-image: 
+            radial-gradient(circle at 15% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 25%),
+            radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 20%);
+        pointer-events: none; z-index: 0;
+    }
+
+    /* Custom Form Inputs */
+    .glass-input {
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.5rem;
+        color: #1b1b20;
+        transition: all 0.2s ease;
+    }
+    .glass-input:focus { outline: none; border-color: #4c5a9d; background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 0 3px rgba(76, 90, 157, 0.2); }
+    .glass-input::placeholder { color: rgba(27, 27, 32, 0.5); }
+    .glass-input:disabled { background: rgba(255, 255, 255, 0.3); cursor: not-allowed; }
+
+    /* DAW Grid Specifics */
+    table.daw-grid { border-collapse: separate; border-spacing: 6px; width: 100%; font-size: 13px; }
+    table.daw-grid th { color: #454650; padding: 12px 8px; font-size: 13px; font-weight: 700; text-align: center; }
+    table.daw-grid td.track-name { 
+        background: #FFFFFF; color: #4c5a9d; text-align: left; padding: 12px 16px; 
+        font-weight: 700; border-radius: 12px; min-width: 160px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); 
+    }
+    table.daw-grid td.cell { 
+        cursor: pointer; height: 56px; min-width: 85px; background: rgba(235, 242, 255, 0.6); 
+        border: 1px solid rgba(255,255,255,0.8); border-radius: 12px; transition: all 0.2s ease; 
+        box-shadow: inset 0 2px 5px rgba(255,255,255,0.4); 
+    }
+    table.daw-grid td.cell:hover { background: rgba(255,255,255,0.9); transform: translateY(-1px); }
+
+    table.daw-grid td.cell.active-0 { background: #A7C5FF; border-color: #8AAEFF; box-shadow: inset 0 0 10px rgba(255,255,255,0.6); } 
+    table.daw-grid td.cell.active-1 { background: #E8C35C; border-color: #D4A836; box-shadow: inset 0 0 10px rgba(255,255,255,0.6); } 
+    table.daw-grid td.cell.active-2 { background: #FD99AB; border-color: #F17A90; box-shadow: inset 0 0 10px rgba(255,255,255,0.6); } 
+    table.daw-grid td.cell.active-3 { background: #E8C35C; border-color: #D4A836; box-shadow: inset 0 0 10px rgba(255,255,255,0.6); } 
+    table.daw-grid td.cell.active-4 { background: #A7C5FF; border-color: #8AAEFF; box-shadow: inset 0 0 10px rgba(255,255,255,0.6); } 
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: rgba(76, 90, 157, 0.3); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(76, 90, 157, 0.5); }
+
+    /* Routing Displays */
+    .view-section { display: none; }
+    .view-section.active { display: flex; animation: slideDown 0.4s ease-out forwards; }
+    
+    /* Stepper Panels */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: popIn 0.4s ease-out forwards; }
+
+    /* Sidebar Toggle Logic */
+    #left-sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    body.sidebar-closed #left-sidebar { transform: translateX(-100%); }
+    body.sidebar-closed #main-content-wrapper { margin-left: 0 !important; }
+    
+    /* Hide Sidebars globally if not in analysis route */
+    body:not([data-route="analysis"]) #left-sidebar { display: none !important; }
+    body:not([data-route="analysis"]) #right-sidebar { display: none !important; }
+    body:not([data-route="analysis"]) #main-content-wrapper { margin-left: 0 !important; }
+</style>
+</head>
+<body class="font-body-md antialiased relative overflow-x-hidden" data-route="home">
+
+<div class="light-lines"></div>
+
+<!-- TopAppBar -->
+<nav class="bg-white/50 backdrop-blur-xl border-b border-white/50 flex justify-between items-center w-full px-4 md:px-6 py-3 z-50 fixed top-0 left-0 right-0 shadow-sm">
+  <div class="flex items-center gap-2 md:gap-3">
+    <!-- 햄버거 메뉴 버튼 (Analysis 라우트에서만 동작하도록 JS에서 처리) -->
+    <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-white/60 transition-colors text-primary mr-1" aria-label="Toggle Menu">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('home')">
+        <img alt="Muboxing Logo" class="h-8 w-8 md:h-9 md:w-9 object-contain rounded-md shadow-sm" src="https://lh3.googleusercontent.com/aida/AP1WRLs92Sypaxs1tnzCrJlfYyajdPpx2xfbrQQPKmf774eldfpJH3MreMMrfr9cKaEUDUK_eLDaeIjPHO_Ptd7Fon4oH4gXE7LKZMkMwa5WEvj2YVHiKFpAobf4BfMPFKRAuYz9xG-6VdE5CkUhPirRVOyT0Rxs83bQgaqtMZIzEilnwHl9L3s7OQ3y2CYPsUEyC66m7mk6reGgFywX63Eh2YolX5m944bT02Qz5TxaXxLcBiWWYptgDDWLEA"/>
+        <span class="font-display-lg text-xl md:text-2xl text-primary tracking-tight hidden sm:inline-block">Muboxing</span>
+    </div>
+  </div>
+  <div class="hidden lg:flex gap-8">
+    <a class="top-nav-item active text-primary font-bold border-b-2 border-primary pb-1 font-label-md transition-colors" data-route="home" href="#" onclick="event.preventDefault(); navigateTo('home')">Home</a>
+    <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="analysis" href="#" onclick="event.preventDefault(); navigateTo('analysis')">Analysis</a>
+    <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="library" href="#" onclick="event.preventDefault(); navigateTo('library')">Library</a>
+    <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="tutor" href="#" onclick="event.preventDefault(); navigateTo('tutor')">Tutor</a>
+    <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="community" href="#" onclick="event.preventDefault(); navigateTo('community')">Community</a>
+  </div>
+  <div class="flex items-center gap-2 md:gap-3">
+    <button id="header-action-btn" class="hidden md:inline-flex bg-primary/10 text-primary font-bold px-4 py-2 rounded-full text-xs shadow-sm hover:bg-primary hover:text-white transition-colors" onclick="resetToHome()">새 언박싱</button>
+    <button class="p-2 rounded-full hover:bg-white/40 transition-all text-primary">
+      <span class="material-symbols-outlined">notifications</span>
+    </button>
+    <div id="nav-auth-guest" class="flex items-center gap-2">
+      <button class="bg-primary text-white font-bold px-4 py-2 rounded-full text-xs shadow-sm hover:bg-primary/90 transition-colors" onclick="openAuthModal()">로그인</button>
+    </div>
+    <div id="nav-auth-user" class="hidden items-center gap-2">
+      <span class="text-xs font-bold text-primary bg-white/60 px-3 py-2 rounded-full border border-white shadow-sm" id="nav-auth-nickname"></span>
+      <button class="p-2 rounded-full hover:bg-white/40 transition-all text-on-surface-variant" title="로그아웃" onclick="logout()">
+        <span class="material-symbols-outlined text-lg">logout</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Auth Modal -->
+<div id="auth-modal" class="hidden fixed inset-0 z-[100] items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+  <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-xl border border-white w-full max-w-sm p-6 md:p-8 relative">
+    <button class="absolute right-4 top-4 text-on-surface-variant hover:text-primary" onclick="closeAuthModal()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div class="flex gap-2 mb-6">
+      <button id="auth-tab-login" class="flex-1 py-2 rounded-xl font-bold text-sm bg-primary text-white shadow-sm" onclick="setAuthTab('login')">로그인</button>
+      <button id="auth-tab-register" class="flex-1 py-2 rounded-xl font-bold text-sm bg-white/60 text-primary" onclick="setAuthTab('register')">회원가입</button>
+    </div>
+    <div id="auth-error" class="hidden text-xs font-bold text-kitsch-red bg-kitsch-red/10 border border-kitsch-red/30 rounded-xl px-3 py-2 mb-4"></div>
+    <div class="flex flex-col gap-3">
+      <div id="auth-nickname-field" class="hidden">
+        <label class="block font-bold text-on-surface-variant text-xs mb-1.5">닉네임</label>
+        <input type="text" id="auth-nickname" class="glass-input w-full p-3 text-sm" placeholder="뮤박싱러">
+      </div>
+      <div>
+        <label class="block font-bold text-on-surface-variant text-xs mb-1.5">이메일</label>
+        <input type="email" id="auth-email" class="glass-input w-full p-3 text-sm" placeholder="you@example.com">
+      </div>
+      <div>
+        <label class="block font-bold text-on-surface-variant text-xs mb-1.5">비밀번호</label>
+        <input type="password" id="auth-password" class="glass-input w-full p-3 text-sm" placeholder="6자 이상">
+      </div>
+      <button id="auth-submit-btn" class="mt-2 w-full bg-primary text-white font-bold py-3 rounded-xl hover:bg-primary/90 transition-all shadow-md" onclick="submitAuth()">로그인</button>
+    </div>
+  </div>
+</div>
+
+<div class="flex pt-[72px] min-h-screen relative z-10 max-w-[1600px] mx-auto overflow-hidden">
+  
+  <!-- Left SideNavBar (Analysis View Only) -->
+  <aside id="left-sidebar" class="flex flex-col w-64 shrink-0 bg-white/30 backdrop-blur-xl border-r border-white/50 p-5 fixed md:sticky top-[72px] h-[calc(100vh-72px)] z-40 rounded-r-2xl shadow-sm">
+    <div class="mb-8 px-2 mt-2">
+      <h3 class="font-display-lg text-xl text-primary mb-1">Tutor Menu</h3>
+      <p class="font-caption-sm text-on-surface-variant text-xs truncate" id="side-song-label">Analyzing: 곡을 선택해주세요</p>
+    </div>
+    <nav class="flex-1 flex flex-col gap-2" id="tutor-menu">
+      <a class="tutor-nav-item side-step-btn active bg-primary text-white rounded-xl flex items-center gap-3 p-3 font-label-md shadow-sm" data-step="feeling" href="#" onclick="event.preventDefault(); goToStep('feeling')">
+        <span class="material-symbols-outlined">mood</span> Feeling
+      </a>
+      <a class="tutor-nav-item side-step-btn text-on-surface-variant flex items-center gap-3 p-3 hover:bg-white/40 rounded-xl font-label-md transition-all" data-step="beat" href="#" onclick="event.preventDefault(); goToStep('beat')">
+        <span class="material-symbols-outlined">equalizer</span> Beat
+      </a>
+      <a class="tutor-nav-item side-step-btn text-on-surface-variant flex items-center gap-3 p-3 hover:bg-white/40 rounded-xl font-label-md transition-all" data-step="melody" href="#" onclick="event.preventDefault(); goToStep('melody')">
+        <span class="material-symbols-outlined">music_note</span> Melody
+      </a>
+      <a class="tutor-nav-item side-step-btn text-on-surface-variant flex items-center gap-3 p-3 hover:bg-white/40 rounded-xl font-label-md transition-all" data-step="structure" href="#" onclick="event.preventDefault(); goToStep('structure')">
+        <span class="material-symbols-outlined">segment</span> Structure
+      </a>
+      <a class="tutor-nav-item side-step-btn text-on-surface-variant flex items-center gap-3 p-3 hover:bg-white/40 rounded-xl font-label-md transition-all" data-step="feedback" href="#" onclick="event.preventDefault(); goToStep('feedback')">
+        <span class="material-symbols-outlined">forum</span> Feedback
+      </a>
+    </nav>
+    <div class="mt-auto flex flex-col gap-2">
+      <button onclick="resetToHome()" class="w-full bg-gradient-to-r from-lavender-mist to-primary-container text-primary font-bold py-3 rounded-xl hover:opacity-90 transition-opacity font-label-md shadow-sm border border-white/50">Start New Analysis</button>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <main id="main-content-wrapper" class="flex-1 w-full p-4 md:p-8 flex flex-col lg:flex-row gap-8 transition-all duration-300 min-w-0">
+    
+    <!-- ================= 0. HOME VIEW ================= -->
+    <div id="view-home" class="view-section active flex-col w-full max-w-6xl mx-auto pb-20">
+      
+      <!-- Hero Section -->
+      <section class="scroll-fade flex flex-col lg:flex-row items-center gap-12 mt-12 mb-28">
+        <div class="flex-1">
+          <div class="inline-flex items-center gap-2 bg-white/60 px-4 py-1.5 rounded-full border border-white text-xs font-bold text-primary mb-6 shadow-sm">
+            <span class="material-symbols-outlined text-sm">auto_awesome</span> AI Music Unboxing Lab
+          </div>
+          <h1 class="font-display-lg text-5xl lg:text-[60px] font-bold text-on-surface leading-[1.15] mb-6 tracking-tight">좋아하는 노래를<br><span class="text-primary">뜯어보면,</span> 내 곡이 보여요</h1>
+          <p class="text-on-surface-variant font-medium text-lg leading-relaxed mb-10 max-w-lg">Muboxing은 감성(Feeling)부터 비트, 멜로디, 구조, 피드백까지 5단계 프레임워크로 레퍼런스 곡을 언박싱하는 AI 음악 튜터입니다. 정답을 외우지 않고, 스스로 분석하는 감각을 기릅니다.</p>
+          <div class="flex gap-4">
+            <button class="bg-primary text-white font-bold py-3.5 px-8 rounded-full shadow-md hover:bg-primary/90 transition-all text-base" onclick="navigateTo('analysis')">무료로 언박싱 시작하기 <span class="material-symbols-outlined align-middle text-[18px] ml-1">arrow_forward</span></button>
+            <button class="bg-white/80 border border-white text-primary font-bold py-3.5 px-6 rounded-full shadow-sm hover:bg-white transition-all text-base">5단계 프레임워크 보기</button>
+          </div>
+          <div class="flex items-center gap-6 mt-8 text-sm font-medium text-on-surface-variant">
+            <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> 가입 없이 체험 가능</span>
+            <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> 초보자·입문자 맞춤 난이도</span>
+          </div>
+        </div>
+        <div class="flex-1 relative w-full aspect-square max-h-[500px]">
+           <img src="https://images.unsplash.com/photo-1614113489855-66422ad300a4?w=800&q=80" class="w-full h-full object-cover rounded-[2rem] shadow-xl border-[6px] border-white/50" alt="Hero Background"/>
+           <div class="absolute -bottom-6 -left-6 bg-white/90 backdrop-blur-md rounded-2xl p-5 shadow-lg border border-white/60 flex gap-4 max-w-[340px] animate-float hidden md:flex">
+              <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-primary text-xl">forum</span></div>
+              <div class="text-[15px] font-medium text-on-surface leading-snug">"안녕하세요! 오늘은 어떤 곡을 언박싱해볼까요? 감성부터 차근차근 함께 뜯어봐요."</div>
+           </div>
+        </div>
+      </section>
+
+      <!-- 5 Steps Section -->
+      <section class="scroll-fade flex flex-col items-center text-center mb-32">
+        <span class="bg-primary-fixed text-on-primary-fixed-variant font-bold px-4 py-1.5 rounded-full text-xs tracking-widest mb-4 uppercase shadow-sm">How it works</span>
+        <h2 class="font-display-lg text-3xl md:text-4xl font-bold text-on-surface mb-4">5단계로 완성하는 언박싱 프레임워크</h2>
+        <p class="text-on-surface-variant font-medium text-lg mb-12">순서대로 따라가며 곡의 표면부터 구조, 창작 적용까지 단계적으로 파고듭니다.</p>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 w-full text-left mb-8">
+          <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hover:-translate-y-1 transition-transform">
+             <div class="text-primary-container font-display-lg text-4xl font-bold mb-3">01</div>
+             <div class="font-bold text-on-surface text-[17px] mb-2">Feeling</div>
+             <p class="text-[13px] text-on-surface-variant font-medium leading-relaxed">첫 인상과 무드 키워드로 감상 언어를 정리해요.</p>
+          </div>
+          <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hover:-translate-y-1 transition-transform">
+             <div class="text-primary-container font-display-lg text-4xl font-bold mb-3">02</div>
+             <div class="font-bold text-on-surface text-[17px] mb-2">Beat</div>
+             <p class="text-[13px] text-on-surface-variant font-medium leading-relaxed">리듬과 그루브, 드럼 패턴을 해부해요.</p>
+          </div>
+          <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hover:-translate-y-1 transition-transform">
+             <div class="text-primary-container font-display-lg text-4xl font-bold mb-3">03</div>
+             <div class="font-bold text-on-surface text-[17px] mb-2">Melody</div>
+             <p class="text-[13px] text-on-surface-variant font-medium leading-relaxed">멜로디 라인과 화성 진행을 따라가요.</p>
+          </div>
+          <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hover:-translate-y-1 transition-transform">
+             <div class="text-primary-container font-display-lg text-4xl font-bold mb-3">04</div>
+             <div class="font-bold text-on-surface text-[17px] mb-2">Structure</div>
+             <p class="text-[13px] text-on-surface-variant font-medium leading-relaxed">섹션별 악기 레이어링을 그리드로 맵핑해요.</p>
+          </div>
+          <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hover:-translate-y-1 transition-transform sm:col-span-2 md:col-span-1">
+             <div class="text-primary-container font-display-lg text-4xl font-bold mb-3">05</div>
+             <div class="font-bold text-on-surface text-[17px] mb-2">Feedback</div>
+             <p class="text-[13px] text-on-surface-variant font-medium leading-relaxed">AI 튜터 피드백을 받고 내 창작에 적용해요.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
+           <div class="bg-white/60 border border-white/80 rounded-2xl p-8 shadow-sm">
+              <div class="w-12 h-12 bg-primary-fixed rounded-xl flex items-center justify-center text-primary mb-5"><span class="material-symbols-outlined text-2xl">bar_chart</span></div>
+              <div class="font-bold text-on-surface text-lg mb-3">DAW처럼 보는 곡의 해부도</div>
+              <p class="text-[14px] text-on-surface-variant font-medium leading-relaxed">섹션 x 트랙 그리드 위에서 비트, 멜로디, 보컬이 언제 들어오고 빠지는지 한눈에 확인해요.</p>
+           </div>
+           <div class="bg-white/60 border border-white/80 rounded-2xl p-8 shadow-sm">
+              <div class="w-12 h-12 bg-secondary-fixed rounded-xl flex items-center justify-center text-secondary mb-5"><span class="material-symbols-outlined text-2xl">forum</span></div>
+              <div class="font-bold text-on-surface text-lg mb-3">AI 튜터의 1:1 피드백</div>
+              <p class="text-[14px] text-on-surface-variant font-medium leading-relaxed">내가 적은 추론과 적용 계획을 AI 튜터가 검토하고, 실전 창작에 바로 쓸 조언을 건네줍니다.</p>
+           </div>
+           <div class="bg-white/60 border border-white/80 rounded-2xl p-8 shadow-sm">
+              <div class="w-12 h-12 bg-tertiary-fixed rounded-xl flex items-center justify-center text-tertiary mb-5"><span class="material-symbols-outlined text-2xl">groups</span></div>
+              <div class="font-bold text-on-surface text-lg mb-3">커뮤니티 언박싱 아카이브</div>
+              <p class="text-[14px] text-on-surface-variant font-medium leading-relaxed">다른 사람들의 완성된 언박싱 기획서를 둘러보고, 내 라이브러리에 나만의 기록을 쌓아요.</p>
+           </div>
+        </div>
+      </section>
+
+      <!-- Archive Section -->
+      <section class="scroll-fade flex flex-col mb-20">
+         <div class="flex items-end justify-between mb-8">
+            <div>
+              <span class="inline-block bg-secondary-fixed text-on-secondary-container font-bold px-3 py-1 rounded-full text-[11px] tracking-wider mb-3 shadow-sm">COMMUNITY</span>
+              <h2 class="font-display-lg text-3xl md:text-4xl font-bold text-on-surface">방금 올라온 언박싱 기획서</h2>
+            </div>
+            <button class="text-sm font-bold text-primary hover:opacity-80 flex items-center gap-1" onclick="navigateTo('community')">전체 보기 <span class="material-symbols-outlined text-lg">chevron_right</span></button>
+         </div>
+         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center font-display-lg font-bold text-[15px] shadow-inner">무</div>
+                  <div>
+                    <p class="font-bold text-on-surface text-sm">무슬빈</p>
+                    <p class="text-xs font-medium text-on-surface-variant">DEAN, Heize - And July</p>
+                  </div>
+                </div>
+              </div>
+              <p class="text-[14px] text-on-surface leading-relaxed font-medium line-clamp-3">프리코러스에서 드럼을 완전히 비웠다가 코러스에서 터뜨리는 드롭아웃 설계가 인상적이었어요. 제 다음 곡 브릿지에도 똑같이 적용해볼 예정입니다.</p>
+            </div>
+            <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center font-display-lg font-bold text-[15px] shadow-inner">소</div>
+                  <div>
+                    <p class="font-bold text-on-surface text-sm">소나기멜로디</p>
+                    <p class="text-xs font-medium text-on-surface-variant">IU - Blueming</p>
+                  </div>
+                </div>
+              </div>
+              <p class="text-[14px] text-on-surface leading-relaxed font-medium line-clamp-3">벌스마다 악기를 한 겹씩 쌓아 올리는 빌드업 패턴을 발견했어요. 신스 레이어가 후렴 직전까지 계속 늘어나더라고요.</p>
+            </div>
+            <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center font-display-lg font-bold text-[15px] shadow-inner">리</div>
+                  <div>
+                    <p class="font-bold text-on-surface text-sm">리듬온리</p>
+                    <p class="text-xs font-medium text-on-surface-variant">Jay Park - 몸매</p>
+                  </div>
+                </div>
+              </div>
+              <p class="text-[14px] text-on-surface leading-relaxed font-medium line-clamp-3">훅 직전 리드 악기만 남기는 미니멀 브릿지 구간을 감성 단계에서부터 짚어냈어요. 여백의 힘을 제대로 배웠습니다.</p>
+            </div>
+         </div>
+      </section>
+      
+      <!-- Bottom CTA -->
+      <section class="scroll-fade bg-white/40 border border-white/60 rounded-[2rem] p-12 md:p-16 text-center mt-10 relative overflow-hidden shadow-sm">
+         <h2 class="font-display-lg text-3xl md:text-4xl font-bold text-on-surface mb-4">오늘 좋아하는 곡, 하나만 뜯어볼까요?</h2>
+         <p class="text-on-surface-variant font-medium mb-10 text-lg">가입 없이 바로 체험할 수 있어요. 5분이면 첫 언박싱을 끝낼 수 있습니다.</p>
+         <button class="bg-primary text-white font-bold py-4 px-10 rounded-full shadow-lg hover:bg-primary/90 transition-all text-base hover:-translate-y-1" onclick="navigateTo('analysis')">언박싱 시작하기 <span class="material-symbols-outlined align-middle text-xl ml-1">arrow_forward</span></button>
+      </section>
+    </div>
+
+    <!-- ================= 1. ANALYSIS VIEW (STEPPER) ================= -->
+    <div id="view-analysis" class="view-section flex-col flex-1 gap-6 min-w-0 w-full">
+      <div class="flex-1 flex flex-col gap-6 min-w-0 bg-white/30 backdrop-blur-xl border border-white/50 rounded-3xl p-4 md:p-8 relative shadow-sm h-[80vh] overflow-y-auto" id="step-container">
+
+        <div class="w-full h-1.5 bg-white/60 rounded-full overflow-hidden mb-2 shrink-0">
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-lavender-mist to-primary rounded-full transition-all duration-300" style="width: 20%"></div>
+        </div>
+
+        <!-- STEP 1: FEELING -->
+        <section id="step-feeling" class="step-panel active">
+          <div class="inline-block bg-secondary-container text-on-secondary-container px-4 py-1.5 rounded-full font-label-md shadow-md text-sm border border-white mb-6">Step 1</div>
+          <h2 class="font-display-lg text-2xl md:text-3xl text-primary mb-8 tracking-tight">Feeling (감상) unboxing</h2>
+          
+          <div class="flex flex-col gap-5">
+            <div>
+              <label class="block font-bold text-on-surface-variant text-sm mb-2">Song Title / YouTube Link <span class="text-kitsch-red">*</span></label>
+              <!-- 이 링크가 Step 4로 파싱되어 들어갑니다 -->
+              <input type="text" id="s-title" class="glass-input w-full p-3.5" placeholder="예: https://www.youtube.com/watch?v=rCeM57e2BfU">
+              <p class="text-[11px] text-primary mt-1 font-bold">* 입력하신 유튜브 링크는 Structure 단계에서 자동 재생됩니다.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block font-bold text-on-surface-variant text-sm mb-2">Artist <span class="text-kitsch-red">*</span></label>
+                <input type="text" id="s-artist" class="glass-input w-full p-3.5" placeholder="예: DEAN, Heize">
+              </div>
+              <div>
+                <label class="block font-bold text-on-surface-variant text-sm mb-2">Genre</label>
+                <select id="s-genre" class="glass-input w-full p-3.5 appearance-none">
+                  <option>R&B / Soul</option>
+                  <option>Pop / Dance</option>
+                  <option>Hip Hop</option>
+                  <option>Indie / Acoustic</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-10">
+            <label class="block font-bold text-primary text-sm mb-3">분석 난이도 선택</label>
+            <div class="flex flex-col gap-3" id="level-wrap"></div>
+          </div>
+
+          <div class="mt-10 flex justify-end gap-3 flex-wrap border-t border-white/50 pt-6">
+            <button class="bg-white/50 border border-white/80 text-primary font-bold py-3 px-6 rounded-xl hover:bg-white/80 transition-all font-label-md shadow-sm" onclick="fillMockData()">✨ And July (샘플 데이터)</button>
+            <button class="bg-primary text-white font-bold py-3 px-8 rounded-xl hover:bg-primary/90 transition-all shadow-md font-label-md flex items-center gap-2" onclick="goToStep('beat')">
+              다음: Beat 언박싱 <span class="material-symbols-outlined text-lg">arrow_forward</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- STEP 2: BEAT -->
+        <section id="step-beat" class="step-panel">
+          <div class="inline-block bg-accent-yellow text-on-surface px-4 py-1.5 rounded-full font-label-md shadow-md text-sm border border-white/50 mb-6">Step 2</div>
+          <h2 class="font-display-lg text-2xl md:text-3xl text-primary mb-8 tracking-tight">Beat (리듬) 언박싱</h2>
+          <p class="text-sm text-on-surface-variant mb-6 font-medium">한 마디를 8개로 쪼개서 킥이 강조되는 지점을 눌러 표시해보세요.</p>
+          <div class="bg-white/25 border border-glass-border/60 rounded-xl p-5 mb-8">
+            <div id="beat-grid" class="grid grid-cols-8 gap-2"></div>
+          </div>
+          <div>
+            <label class="block font-bold text-on-surface-variant text-sm mb-2 uppercase tracking-wide">그루브 관찰 메모</label>
+            <textarea id="note-beat" rows="4" class="w-full glass-input p-4 text-sm" placeholder="예: 스네어가 살짝 밀려 들어와서 레이드백한 느낌을 줘요."></textarea>
+          </div>
+          <div class="mt-10 flex justify-between border-t border-white/50 pt-6">
+            <button class="bg-white/50 border border-white/80 text-primary font-bold py-3 px-6 rounded-xl hover:bg-white/80 transition-all shadow-sm font-label-md flex items-center gap-1" onclick="goToStep('feeling')"><span class="material-symbols-outlined text-lg">arrow_back</span> 이전</button>
+            <button class="bg-primary text-white font-bold py-3 px-8 rounded-xl hover:bg-primary/90 transition-all shadow-md font-label-md flex items-center gap-2" onclick="goToStep('melody')">
+              다음: Melody 언박싱 <span class="material-symbols-outlined text-lg">arrow_forward</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- STEP 3: MELODY -->
+        <section id="step-melody" class="step-panel">
+          <div class="inline-block bg-secondary-fixed text-on-secondary-fixed-variant px-4 py-1.5 rounded-full font-label-md shadow-md text-sm border border-white mb-6">Step 3</div>
+          <h2 class="font-display-lg text-2xl md:text-3xl text-primary mb-8 tracking-tight">Melody (선율) 언박싱</h2>
+          <p class="text-sm text-on-surface-variant mb-6 font-medium">섹션별로 멜로디 라인이 등장하는 구간을 색칠해보세요.</p>
+          <div class="bg-white/25 border border-glass-border/60 rounded-xl p-5 mb-8 overflow-x-auto">
+            <div class="min-w-[500px]">
+              <div class="grid grid-cols-[80px_repeat(5,1fr)] gap-2 items-center">
+                <div class="flex items-center gap-1.5 text-sm text-secondary font-bold"><span class="material-symbols-outlined text-base">music_note</span>Melody</div>
+                <div id="melody-grid" class="contents"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="block font-bold text-on-surface-variant text-sm mb-2 uppercase tracking-wide">멜로디 라인 설명</label>
+            <textarea id="note-melody" rows="4" class="w-full glass-input p-4 text-sm" placeholder="예: 코러스에서 음역대를 확 끌어올려서 훅을 강조해요."></textarea>
+          </div>
+          <div class="mt-10 flex justify-between border-t border-white/50 pt-6">
+            <button class="bg-white/50 border border-white/80 text-primary font-bold py-3 px-6 rounded-xl hover:bg-white/80 transition-all shadow-sm font-label-md flex items-center gap-1" onclick="goToStep('beat')"><span class="material-symbols-outlined text-lg">arrow_back</span> 이전</button>
+            <button class="bg-primary text-white font-bold py-3 px-8 rounded-xl hover:bg-primary/90 transition-all shadow-md font-label-md flex items-center gap-2" onclick="goToStep('structure')">
+              다음: Structure 언박싱 <span class="material-symbols-outlined text-lg">arrow_forward</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- STEP 4: STRUCTURE -->
+        <section id="step-structure" class="step-panel">
+          <div class="inline-block bg-primary-container text-on-primary-container px-4 py-1.5 rounded-full font-label-md shadow-md text-sm border border-white mb-6">Step 4</div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-display-lg text-2xl md:text-3xl text-primary tracking-tight">Structure (구조) 언박싱</h2>
+            <span class="bg-white/60 text-primary px-3 py-1 rounded-lg text-xs font-bold border border-white shadow-sm" id="mode-badge">MODE</span>
+          </div>
+          <p class="text-sm text-on-surface-variant mb-6 font-medium">영상을 들으며 악기가 들어오고 빠지는 타이밍을 직접 칠해보세요.</p>
+          
+          <!-- YouTube Autoplay IFRAME is injected here. Autoplay removed to prevent 150/153 errors. -->
+          <div id="video-container" class="w-full aspect-video rounded-xl overflow-hidden bg-black shadow-lg border border-white/30 mb-8 relative group max-w-4xl mx-auto"></div>
+
+          <div id="interactive-area" class="w-full overflow-hidden"></div>
+
+          <div class="mt-6">
+            <label class="block font-bold text-on-surface-variant text-sm mb-2 uppercase tracking-wide">구조 관찰 메모</label>
+            <textarea id="note-structure" rows="3" class="w-full glass-input p-4 text-sm" placeholder="예: 프리코러스에서 드럼이 완전히 빠졌다가 코러스에서 한꺼번에 터져요."></textarea>
+          </div>
+
+          <div class="mt-10 flex justify-between border-t border-white/50 pt-6">
+            <button class="bg-white/50 border border-white/80 text-primary font-bold py-3 px-6 rounded-xl hover:bg-white/80 transition-all shadow-sm font-label-md flex items-center gap-1" onclick="goToStep('melody')"><span class="material-symbols-outlined text-lg">arrow_back</span> 이전</button>
+            <button class="bg-primary text-white font-bold py-3 px-8 rounded-xl hover:bg-primary/90 transition-all shadow-md font-label-md flex items-center gap-2" onclick="goToStep('feedback')">
+              다음: Feedback 받기 <span class="material-symbols-outlined text-lg">arrow_forward</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- STEP 5: FEEDBACK & DONE -->
+        <section id="step-feedback" class="step-panel">
+          <div class="inline-block bg-kitsch-red text-white px-4 py-1.5 rounded-full font-label-md shadow-md text-sm border border-white mb-6">Step 5</div>
+          <h2 class="font-display-lg text-2xl md:text-3xl text-primary mb-8 tracking-tight">내 창작에 적용하기 & 피드백</h2>
+          <p class="text-sm text-on-surface-variant mb-8 font-medium">지금까지의 관찰을 바탕으로 내 곡에 어떻게 적용할지 적고, AI 튜터의 피드백을 받아보세요.</p>
+          
+          <div class="mb-8">
+            <label class="flex items-center gap-2 font-bold text-kitsch-red text-sm mb-2">
+              <span class="material-symbols-outlined text-base">tips_and_updates</span> 나의 창작 적용 계획
+            </label>
+            <textarea id="note-apply" rows="5" class="w-full glass-input p-4 text-base" placeholder="예: 내 브릿지 파트에서도 악기를 하나씩 빼면서 빌드업 해야겠어요."></textarea>
+          </div>
+          
+          <div class="flex flex-col gap-4 max-w-3xl mx-auto mb-8">
+            <button id="feedback-btn" class="w-full bg-[#4c5a9d] text-white font-bold py-4 rounded-xl hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2 text-lg" onclick="getAIFeedback()">
+              ✨ AI 튜터 피드백 받기
+            </button>
+            <div id="ai-feedback-box" class="hidden mt-4 bg-white/70 backdrop-blur-md border-2 border-primary/40 rounded-2xl p-6 shadow-sm">
+              <div class="flex items-center gap-2 mb-3 pb-3 border-b border-primary/20">
+                <span class="material-symbols-outlined text-primary text-xl">smart_toy</span>
+                <span class="font-bold text-primary text-base">AI 튜터 피드백 코칭</span>
+              </div>
+              <div id="ai-feedback-content" class="text-[15px] text-on-surface leading-relaxed whitespace-pre-line font-medium min-h-[80px]"></div>
+            </div>
+          </div>
+
+          <div class="mt-auto flex items-center justify-between border-t border-white/50 pt-6">
+            <button class="bg-white/50 border border-white/80 text-primary font-bold py-3 px-6 rounded-xl hover:bg-white/80 transition-all shadow-sm font-label-md flex items-center gap-1" onclick="goToStep('structure')"><span class="material-symbols-outlined text-lg">arrow_back</span> 이전</button>
+            <button id="finish-btn" class="bg-[#F4CE42] text-on-surface font-bold py-3 px-10 rounded-xl hover:opacity-90 transition-opacity shadow-lg text-base flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled onclick="completeAnalysis()">
+              기획서 완성하기 🎉
+            </button>
+          </div>
+        </section>
+
+      </div>
+  
+      <!-- RIGHT: AI TUTOR PANEL (Visible ONLY in Analysis) -->
+      <aside id="right-sidebar" class="hidden lg:flex flex-col w-full lg:w-[320px] gap-5 relative shrink-0">
+        <div class="relative w-full h-48 rounded-2xl overflow-hidden border border-white/50 shadow-lg bg-white/20 p-1">
+          <img class="w-full h-full object-cover rounded-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1hDszNU1m3E_ancrxXbJiXyh4lfbNkHBt9NR4vH9dFJQW9Z0qLkwGjMPygby415sB-GhOlENXwtRAAVjJnrvqpFr6hEoOJk2QRQ0cNpXBaYAGLpnjumRmXR3CLEmqeiM4MPboPyYstg73AOjcBVVwpDHnKxkd7txGFR-vQMszU1-MFvk5tTjZFdt1AD4SBBBAuw_ZjvjIEbyqh6DScZPdUSX2U3KT7nU1pUKYiwKYW2xP5NNeGxxFq5LDfkE4mHcKMVlt1prP4A" alt="AI Music Tutor Avatar"/>
+          <div class="absolute bottom-3 left-3 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white text-xs font-bold text-primary flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-sm">smart_toy</span> AI Tutor Alex
+          </div>
+        </div>
+
+        <div class="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-sm flex flex-col h-[420px]">
+          <div class="border-b border-white/50 pb-3 mb-3 flex items-center gap-2 px-2">
+            <span class="material-symbols-outlined text-primary">forum</span>
+            <span class="font-display-lg text-lg text-primary">Tutor Chat</span>
+          </div>
+          <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-2 pb-2 scrollbar-hide" id="tutor-greeting">
+            <!-- Chat history injected here -->
+          </div>
+          <div class="pt-3 mt-2 border-t border-white/50 flex gap-2">
+            <input type="text" id="chat-input" placeholder="튜터에게 질문하기..." class="glass-input flex-1 px-4 py-2 text-sm" onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button id="chat-send-btn" class="bg-primary hover:bg-primary/90 text-white w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm cursor-pointer" onclick="sendChatMessage()">
+              <span class="material-symbols-outlined text-sm">send</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ================= 2. LIBRARY VIEW ================= -->
+    <div id="view-library" class="view-section flex-col w-full px-2 max-w-6xl mx-auto">
+      <div class="mb-10 mt-6">
+        <span class="inline-block bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold px-3 py-1 rounded-full mb-3 shadow-sm tracking-wider">MY LIBRARY</span>
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h2 class="text-3xl md:text-4xl font-display-lg font-bold text-on-surface mb-2">내가 언박싱한 곡들</h2>
+            <p class="text-on-surface-variant text-sm font-medium">지금까지 완성한 분석 기획서를 모아봤어요. 언제든 이어서 다듬을 수 있어요.</p>
+          </div>
+          <div class="relative w-full md:w-72 shrink-0">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+            <input type="text" id="library-search" oninput="renderLibraryGrid()" class="glass-input w-full pl-10 pr-4 py-2.5 text-sm rounded-full bg-white/60" placeholder="곡 제목, 아티스트 검색">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide" id="library-genre-filters">
+        <button class="lib-genre-btn bg-primary text-white px-5 py-2 rounded-full text-sm font-bold shadow-sm whitespace-nowrap" data-genre="전체" onclick="setLibraryGenreFilter('전체')">전체</button>
+        <button class="lib-genre-btn bg-white/50 hover:bg-white/80 text-on-surface-variant px-5 py-2 rounded-full text-sm font-bold shadow-sm transition-colors whitespace-nowrap" data-genre="R&B / Soul" onclick="setLibraryGenreFilter('R&B / Soul')">R&B / Soul</button>
+        <button class="lib-genre-btn bg-white/50 hover:bg-white/80 text-on-surface-variant px-5 py-2 rounded-full text-sm font-bold shadow-sm transition-colors whitespace-nowrap" data-genre="Pop / Dance" onclick="setLibraryGenreFilter('Pop / Dance')">Pop</button>
+        <button class="lib-genre-btn bg-white/50 hover:bg-white/80 text-on-surface-variant px-5 py-2 rounded-full text-sm font-bold shadow-sm transition-colors whitespace-nowrap" data-genre="Hip Hop" onclick="setLibraryGenreFilter('Hip Hop')">Hip Hop</button>
+        <button class="lib-genre-btn bg-white/50 hover:bg-white/80 text-on-surface-variant px-5 py-2 rounded-full text-sm font-bold shadow-sm transition-colors whitespace-nowrap" data-genre="Indie / Acoustic" onclick="setLibraryGenreFilter('Indie / Acoustic')">Indie / Acoustic</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="library-grid">
+        <p class="text-sm text-on-surface-variant font-medium col-span-full">불러오는 중...</p>
+      </div>
+    </div>
+
+    <!-- ================= 3. TUTOR VIEW ================= -->
+    <div id="view-tutor" class="view-section w-full px-2 max-w-6xl mx-auto mt-6">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 w-full">
+        <!-- Left: Large Chat Panel -->
+        <div class="glass-card p-6 md:p-8 flex flex-col h-[75vh]">
+          <div class="flex items-center gap-3 mb-6 pb-4 border-b border-glass-border">
+            <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center text-primary shadow-inner">
+              <span class="material-symbols-outlined text-[28px]">smart_toy</span>
+            </div>
+            <div>
+              <h2 class="text-xl font-display-lg font-bold text-on-surface">AI 튜터</h2>
+              <p class="text-sm text-on-surface-variant font-medium">언제든 편하게 질문해보세요</p>
+            </div>
+          </div>
+          
+          <div class="flex-1 overflow-y-auto flex flex-col gap-4 mb-4 scrollbar-hide pr-2" id="global-chat-log">
+            <div class="bg-white/80 border border-white/60 rounded-2xl rounded-tl-sm p-5 text-[15px] font-medium text-on-surface shadow-sm self-start max-w-[85%] leading-relaxed">
+              안녕하세요! 저는 Muboxing의 AI 튜터 Alex예요. 지금 분석 중인 곡이 있다면 궁금한 점을 편하게 물어보세요.<br><br>없다면 5단계 프레임워크에 대해 설명해드릴 수도 있어요.
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2.5 mb-4">
+            <button class="bg-white/60 hover:bg-white/90 border border-white text-primary text-xs font-bold px-4 py-2 rounded-full shadow-sm transition-all" onclick="sendGlobalChatMessage(this.innerText)">Feeling 단계가 뭔가요?</button>
+            <button class="bg-white/60 hover:bg-white/90 border border-white text-primary text-xs font-bold px-4 py-2 rounded-full shadow-sm transition-all" onclick="sendGlobalChatMessage(this.innerText)">코러스 빌드업은 어떻게 분석해요?</button>
+            <button class="bg-white/60 hover:bg-white/90 border border-white text-primary text-xs font-bold px-4 py-2 rounded-full shadow-sm transition-all" onclick="sendGlobalChatMessage(this.innerText)">초보자 모드 추천해줘</button>
+          </div>
+
+          <div class="relative mt-auto">
+            <input type="text" id="global-chat-input" class="glass-input w-full pl-5 pr-14 py-4 text-sm font-medium rounded-full bg-white/60" placeholder="튜터에게 메시지 보내기..." onkeypress="if(event.key==='Enter') sendGlobalChatMessage()">
+            <button class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary/90 shadow-md transition-colors" onclick="sendGlobalChatMessage()">
+              <span class="material-symbols-outlined text-[20px]">send</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Information Panels -->
+        <div class="flex flex-col gap-6">
+          <div class="bg-white/50 border border-white/80 rounded-2xl p-6 shadow-sm">
+            <h3 class="text-primary font-bold text-lg mb-5 font-display-lg">5단계 프레임워크</h3>
+            <ul class="flex flex-col gap-5">
+              <li class="flex items-start gap-4">
+                <span class="text-primary/40 font-mono font-bold text-base">01</span>
+                <div>
+                  <div class="font-bold text-[15px] text-on-surface leading-tight">Feeling</div>
+                  <div class="text-[13px] text-on-surface-variant font-medium mt-0.5">첫 인상 · 무드 키워드</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-4">
+                <span class="text-primary/40 font-mono font-bold text-base">02</span>
+                <div>
+                  <div class="font-bold text-[15px] text-on-surface leading-tight">Beat</div>
+                  <div class="text-[13px] text-on-surface-variant font-medium mt-0.5">리듬 · 그루브</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-4">
+                <span class="text-primary/40 font-mono font-bold text-base">03</span>
+                <div>
+                  <div class="font-bold text-[15px] text-on-surface leading-tight">Melody</div>
+                  <div class="text-[13px] text-on-surface-variant font-medium mt-0.5">멜로디 라인 · 화성</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-4">
+                <span class="text-primary/40 font-mono font-bold text-base">04</span>
+                <div>
+                  <div class="font-bold text-[15px] text-on-surface leading-tight">Structure</div>
+                  <div class="text-[13px] text-on-surface-variant font-medium mt-0.5">섹션별 레이어링</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-4">
+                <span class="text-primary/40 font-mono font-bold text-base">05</span>
+                <div>
+                  <div class="font-bold text-[15px] text-on-surface leading-tight">Feedback</div>
+                  <div class="text-[13px] text-on-surface-variant font-medium mt-0.5">AI 피드백 · 창작 적용</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="bg-white/50 border border-white/80 rounded-2xl p-6 shadow-sm">
+            <h3 class="text-primary font-bold text-lg mb-4 font-display-lg">지금 분석 중인 곡</h3>
+            <p class="font-bold text-[15px] text-on-surface mb-1">DEAN, Heize – And July</p>
+            <p class="text-[13px] text-on-surface-variant font-medium mb-6">R&B / Soul</p>
+            <button onclick="navigateTo('analysis')" class="w-full bg-white/80 border border-white shadow-sm hover:bg-white text-primary font-bold text-sm py-3 rounded-xl flex items-center justify-center gap-1 transition-all">
+              워크스페이스로 이동 <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 4. COMMUNITY VIEW ================= -->
+    <div id="view-community" class="view-section flex-col w-full px-2 max-w-4xl mx-auto pb-10 mt-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+        <div>
+          <span class="inline-block bg-secondary-fixed text-on-secondary-container text-[10px] font-bold px-3 py-1 rounded-full mb-3 shadow-sm tracking-wider">COMMUNITY</span>
+          <h2 class="text-3xl md:text-4xl font-display-lg font-bold text-on-surface mb-2">언박싱 아카이브</h2>
+          <p class="text-on-surface-variant text-sm font-medium">다른 사람들이 완성한 분석 기획서를 둘러보고 영감을 얻어보세요.</p>
+        </div>
+        <button class="bg-primary text-white font-bold px-6 py-3 rounded-full shadow-md hover:bg-primary/90 transition-all text-sm shrink-0 whitespace-nowrap" onclick="shareToCommunity()">내 언박싱 공유하기</button>
+      </div>
+
+      <div class="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide" id="community-genre-filters">
+        <button class="comm-genre-btn bg-primary text-white px-5 py-2 rounded-full text-sm font-bold shadow-sm whitespace-nowrap" data-genre="전체" onclick="setCommunityGenreFilter('전체')">전체</button>
+        <button class="comm-genre-btn bg-white/50 hover:bg-white/80 text-on-surface-variant px-5 py-2 rounded-full text-sm font-bold shadow-sm transition-colors whitespace-nowrap" data-genre="R&B / Soul" onclick="setCommunityGenreFilter('R&B / Soul')">R&B / Soul</button>
+        <button class="comm-genre-btn bg-white/50 hover:bg-white/80 text-on-surface-variant px-5 py-2 rounded-full text-sm font-bold shadow-sm transition-colors whitespace-nowrap" data-genre="Pop / Dance" onclick="setCommunityGenreFilter('Pop / Dance')">Pop</button>
+        <button class="comm-genre-btn bg-white/50 hover:bg-white/80 text-on-surface-variant px-5 py-2 rounded-full text-sm font-bold shadow-sm transition-colors whitespace-nowrap" data-genre="Hip Hop" onclick="setCommunityGenreFilter('Hip Hop')">Hip Hop</button>
+      </div>
+
+      <div class="flex flex-col gap-5" id="community-list">
+        <p class="text-sm text-on-surface-variant font-medium">불러오는 중...</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="mt-auto py-8 text-center text-xs font-medium text-on-surface-variant relative z-10 opacity-70">
+  © 2026 Muboxing Lab. All rights reserved.
+</footer>
+
+<!-- Inline Done Step for Stepper Completion -->
+<div id="step-done" class="hidden absolute inset-0 bg-white/40 backdrop-blur-xl z-50 p-6 md:p-10 text-center overflow-y-auto w-full h-full">
+  <div class="max-w-4xl mx-auto mt-10">
+    <div class="inline-block bg-kitsch-red text-white font-bold font-mono px-4 py-1.5 rounded-full text-xs shadow-md mb-6">UNBOXING COMPLETE</div>
+    <h2 class="font-display-lg text-4xl md:text-5xl text-primary font-bold mb-4 tracking-tight">🎉 나만의 분석 기획서</h2>
+    <div class="inline-flex items-center justify-center gap-2 bg-white/60 px-5 py-2 rounded-full border border-white text-base font-bold text-primary mb-12 shadow-sm mx-auto">
+      <span class="material-symbols-outlined text-[20px]">music_note</span> <span id="done-subtitle">DEAN, Heize - And July</span>
+    </div>
+    
+    <div class="bg-white/60 border border-white rounded-2xl p-6 md:p-10 shadow-inner text-left flex flex-col gap-8 mb-10">
+       <div>
+         <strong class="block text-primary text-sm mb-3 uppercase tracking-wide font-bold flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">psychology_alt</span> 작곡 의도 추론</strong>
+         <p id="done-infer" class="text-on-surface font-medium leading-relaxed bg-white/50 p-5 rounded-xl border border-white/60 text-[15px]"></p>
+       </div>
+       <div>
+         <strong class="block text-kitsch-red text-sm mb-3 uppercase tracking-wide font-bold flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">tips_and_updates</span> 실전 창작 반영 계획</strong>
+         <p id="done-apply" class="text-on-surface font-medium leading-relaxed bg-white/50 p-5 rounded-xl border border-white/60 text-[15px]"></p>
+       </div>
+    </div>
+
+    <div class="flex justify-center gap-4 flex-wrap pb-20">
+      <button class="bg-white/60 border border-white text-primary font-bold py-3.5 px-6 rounded-xl hover:bg-white/80 transition-all shadow-sm flex items-center gap-2" onclick="alert('기획서 전체가 클립보드에 복사되었습니다.')"><span class="material-symbols-outlined text-lg">content_copy</span> 전체 텍스트 복사</button>
+      <button class="bg-primary text-white font-bold py-3.5 px-8 rounded-xl hover:bg-primary/90 transition-all shadow-md flex items-center gap-2" onclick="resetToHome()"><span class="material-symbols-outlined text-lg">replay</span> 새로운 곡 언박싱</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== Scroll Animation Observer ===================== */
+function initScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('opacity-100', 'translate-y-0');
+        entry.target.classList.remove('opacity-0', 'translate-y-10');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.scroll-fade').forEach(el => {
+    el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-[800ms]', 'ease-out');
+    observer.observe(el);
+  });
+}
+
+/* ===================== Routing / Navigation ===================== */
+function navigateTo(route) {
+  document.body.setAttribute('data-route', route);
+  
+  // 사이드바가 열려있을 때 닫기 처리
+  document.body.classList.remove('sidebar-closed');
+
+  document.querySelectorAll('.top-nav-item').forEach(el => {
+    if (el.dataset.route === route) {
+      el.classList.add('active');
+      el.classList.remove('text-on-surface-variant');
+    } else {
+      el.classList.remove('active');
+      el.classList.add('text-on-surface-variant');
+    }
+  });
+
+  document.querySelectorAll('.view-section').forEach(view => {
+    view.classList.remove('active');
+  });
+  
+  const targetView = document.getElementById(`view-${route}`);
+  if(targetView) {
+    targetView.classList.add('active');
+  }
+
+  const newActionBtn = document.getElementById('header-action-btn');
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+  
+  if (route === 'analysis') {
+    newActionBtn.classList.add('hidden');
+    sidebarToggle.classList.remove('hidden'); // Analysis 에서만 햄버거 메뉴 보임
+    if(!state.visited.has(state.step)) goToStep('feeling');
+  } else {
+    newActionBtn.classList.remove('hidden');
+    sidebarToggle.classList.add('hidden'); // 다른 라우트에서는 숨김
+    document.getElementById('step-done').classList.add('hidden');
+  }
+
+  if (route === 'library') loadLibrary();
+  if (route === 'community') loadCommunity();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ===================== Library & Community (real data) ===================== */
+const GENRE_BADGE_CLASS = {
+  'R&B / Soul': 'bg-secondary-container',
+  'Pop / Dance': 'bg-tertiary-container',
+  'Hip Hop': 'bg-primary-container',
+  'Indie / Acoustic': 'bg-accent-yellow',
+};
+
+let libraryItems = [];
+let libraryGenreFilter = '전체';
+let communityGenreFilter = '전체';
+
+async function loadLibrary() {
+  const grid = document.getElementById('library-grid');
+  if (!currentUser) {
+    grid.innerHTML = '<p class="text-sm text-on-surface-variant font-medium col-span-full">로그인하면 내가 언박싱한 곡을 모아볼 수 있어요. <button class="text-primary font-bold underline" onclick="openAuthModal()">로그인 / 회원가입</button></p>';
+    return;
+  }
+  grid.innerHTML = '<p class="text-sm text-on-surface-variant font-medium col-span-full">불러오는 중...</p>';
+  try {
+    libraryItems = await authFetch('/analyses/mine');
+    renderLibraryGrid();
+  } catch (e) {
+    grid.innerHTML = `<p class="text-sm text-kitsch-red font-medium col-span-full">불러오지 못했어요: ${e.message}</p>`;
+  }
+}
+
+function setLibraryGenreFilter(genre) {
+  libraryGenreFilter = genre;
+  document.querySelectorAll('.lib-genre-btn').forEach(b => {
+    const active = b.dataset.genre === genre;
+    b.classList.toggle('bg-primary', active);
+    b.classList.toggle('text-white', active);
+    b.classList.toggle('bg-white/50', !active);
+    b.classList.toggle('text-on-surface-variant', !active);
+  });
+  renderLibraryGrid();
+}
+
+function renderLibraryGrid() {
+  const grid = document.getElementById('library-grid');
+  if (!currentUser) return;
+  if (!libraryItems.length) {
+    grid.innerHTML = '<p class="text-sm text-on-surface-variant font-medium col-span-full">아직 언박싱한 곡이 없어요. Analysis 탭에서 첫 곡을 시작해보세요!</p>';
+    return;
+  }
+  const search = (document.getElementById('library-search')?.value || '').trim().toLowerCase();
+  const filtered = libraryItems.filter(item => {
+    const genreOk = libraryGenreFilter === '전체' || item.genre === libraryGenreFilter;
+    const searchOk = !search || (item.title || '').toLowerCase().includes(search) || (item.artist || '').toLowerCase().includes(search);
+    return genreOk && searchOk;
+  });
+  if (!filtered.length) {
+    grid.innerHTML = '<p class="text-sm text-on-surface-variant font-medium col-span-full">조건에 맞는 곡이 없어요.</p>';
+    return;
+  }
+  grid.innerHTML = filtered.map(item => `
+    <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer" onclick="navigateTo('analysis')">
+      <div class="flex justify-between items-center mb-4">
+        <span class="${GENRE_BADGE_CLASS[item.genre] || 'bg-primary-container'} text-white px-3 py-1 rounded-full text-[11px] font-bold tracking-wide">${item.genre || '기타'}</span>
+        <span class="text-xs font-bold text-on-surface-variant">${item.progress}%</span>
+      </div>
+      <h3 class="text-xl font-display-lg font-bold text-on-surface mb-1">${item.title || '제목 없음'}</h3>
+      <p class="text-sm font-medium text-on-surface-variant mb-6">${item.artist || ''}</p>
+      <div class="w-full h-1.5 bg-white/80 rounded-full mb-4 overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: ${item.progress}%"></div></div>
+      <div class="flex justify-between items-center mt-2">
+        <span class="text-xs font-medium text-on-surface-variant">${item.completed ? '기획서 완성' : (item.current_step + ' 단계 진행 중')}</span>
+        <span class="text-xs font-bold text-primary flex items-center gap-0.5 hover:opacity-80 transition-opacity">이어하기 <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setCommunityGenreFilter(genre) {
+  communityGenreFilter = genre;
+  document.querySelectorAll('.comm-genre-btn').forEach(b => {
+    const active = b.dataset.genre === genre;
+    b.classList.toggle('bg-primary', active);
+    b.classList.toggle('text-white', active);
+    b.classList.toggle('bg-white/50', !active);
+    b.classList.toggle('text-on-surface-variant', !active);
+  });
+  loadCommunity();
+}
+
+async function loadCommunity() {
+  const list = document.getElementById('community-list');
+  list.innerHTML = '<p class="text-sm text-on-surface-variant font-medium">불러오는 중...</p>';
+  try {
+    const query = communityGenreFilter !== '전체' ? `?genre=${encodeURIComponent(communityGenreFilter)}` : '';
+    const posts = await authFetch('/community/posts' + query);
+    if (!posts.length) {
+      list.innerHTML = '<p class="text-sm text-on-surface-variant font-medium">아직 공유된 언박싱이 없어요. 첫 번째로 공유해보세요!</p>';
+      return;
+    }
+    list.innerHTML = posts.map(p => `
+      <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center font-display-lg font-bold text-[15px] shadow-inner">${(p.owner_nickname || '?').charAt(0)}</div>
+            <div>
+              <p class="font-bold text-on-surface text-sm">${p.owner_nickname}</p>
+              <p class="text-xs font-medium text-on-surface-variant">${p.artist ? p.artist + ' - ' : ''}${p.song_title}</p>
+            </div>
+          </div>
+          <span class="${GENRE_BADGE_CLASS[p.genre] || 'bg-primary-container'} text-white px-3 py-1 rounded-full text-[11px] font-bold shadow-sm">${p.genre || '기타'}</span>
+        </div>
+        <p class="text-[15px] text-on-surface leading-relaxed mb-5 font-medium">${p.content}</p>
+        <div class="flex items-center gap-5 text-on-surface-variant text-sm font-bold">
+          <button class="flex items-center gap-1.5 transition-colors ${p.liked_by_me ? 'text-kitsch-red' : 'hover:text-kitsch-red'}" onclick="toggleLike(${p.id})"><span class="material-symbols-outlined text-[18px]">favorite</span> <span id="like-count-${p.id}">${p.likes_count}</span></button>
+          <button class="flex items-center gap-1.5 hover:text-primary transition-colors" onclick="toggleComments(${p.id})"><span class="material-symbols-outlined text-[18px]">chat_bubble</span> <span id="comment-count-${p.id}">${p.comments_count}</span></button>
+        </div>
+        <div id="comments-panel-${p.id}" class="hidden mt-4 pt-4 border-t border-white/60">
+          <div id="comments-list-${p.id}" class="flex flex-col gap-3 mb-3"></div>
+          <div class="flex gap-2">
+            <input id="comment-input-${p.id}" class="glass-input flex-1 px-3 py-2 text-xs" placeholder="댓글 달기..." onkeypress="if(event.key==='Enter') submitComment(${p.id})">
+            <button class="bg-primary text-white px-3 py-2 rounded-lg text-xs font-bold shrink-0" onclick="submitComment(${p.id})">등록</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    list.innerHTML = `<p class="text-sm text-kitsch-red font-medium">불러오지 못했어요: ${e.message}</p>`;
+  }
+}
+
+async function toggleLike(postId) {
+  if (!requireLogin()) return;
+  try {
+    const res = await authFetch(`/community/posts/${postId}/like`, { method: 'POST' });
+    document.getElementById(`like-count-${postId}`).textContent = res.likes_count;
+  } catch (e) {
+    console.warn('좋아요 실패', e);
+  }
+}
+
+function renderCommentList(postId, comments) {
+  const listEl = document.getElementById(`comments-list-${postId}`);
+  if (!listEl) return;
+  if (!comments.length) {
+    listEl.innerHTML = '<p class="text-xs text-on-surface-variant">아직 댓글이 없어요. 첫 댓글을 남겨보세요!</p>';
+    return;
+  }
+  listEl.innerHTML = comments.map(c => `
+    <div class="flex gap-2 items-start">
+      <div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">${(c.owner_nickname || '?').charAt(0)}</div>
+      <div class="text-xs"><span class="font-bold text-on-surface">${c.owner_nickname}</span> <span class="text-on-surface-variant">${c.content}</span></div>
+    </div>
+  `).join('');
+}
+
+async function toggleComments(postId) {
+  const panel = document.getElementById(`comments-panel-${postId}`);
+  if (!panel) return;
+  const wasHidden = panel.classList.contains('hidden');
+  panel.classList.toggle('hidden');
+  if (wasHidden && !panel.dataset.loaded) {
+    panel.dataset.loaded = '1';
+    try {
+      const comments = await authFetch(`/community/posts/${postId}/comments`);
+      renderCommentList(postId, comments);
+    } catch (e) {
+      document.getElementById(`comments-list-${postId}`).innerHTML = `<p class="text-xs text-kitsch-red">댓글을 불러오지 못했어요: ${e.message}</p>`;
+    }
+  }
+}
+
+async function submitComment(postId) {
+  if (!requireLogin()) return;
+  const input = document.getElementById(`comment-input-${postId}`);
+  const content = input.value.trim();
+  if (!content) return;
+  try {
+    await authFetch(`/community/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ content }) });
+    input.value = '';
+    const comments = await authFetch(`/community/posts/${postId}/comments`);
+    renderCommentList(postId, comments);
+    document.getElementById(`comment-count-${postId}`).textContent = comments.length;
+  } catch (e) {
+    alert('댓글을 남기지 못했어요: ' + e.message);
+  }
+}
+
+async function shareToCommunity() {
+  if (!requireLogin()) return;
+  const songTitle = prompt('공유할 곡 제목을 입력하세요.', state.songInfo.title && !state.songInfo.title.startsWith('http') ? state.songInfo.title : (state.analysisId ? state.songInfo.artist : ''));
+  if (songTitle === null || !songTitle.trim()) return;
+  const content = prompt('이번 언박싱에서 배운 점을 짧게 공유해보세요.', state.inference || '');
+  if (content === null || !content.trim()) return;
+
+  try {
+    await authFetch('/community/posts', {
+      method: 'POST',
+      body: JSON.stringify({
+        analysis_id: state.analysisId,
+        song_title: songTitle.trim(),
+        artist: state.songInfo.artist || '',
+        genre: state.songInfo.genre || '',
+        content: content.trim(),
+      }),
+    });
+    loadCommunity();
+  } catch (e) {
+    alert('공유하지 못했어요: ' + e.message);
+  }
+}
+
+/* ===================== Sidebar Toggle Logic ===================== */
+document.getElementById('sidebar-toggle').addEventListener('click', () => {
+    document.body.classList.toggle('sidebar-closed');
+});
+
+/* ===================== Muboxing — Analysis App State & Logic ===================== */
+const PROGRESS = { feeling: 20, beat: 40, melody: 60, structure: 80, feedback: 100 };
+  
+let SECTIONS = ['Intro', 'Verse 1', 'Pre-Chorus', 'Chorus', 'Outro'];
+const TRACKS = [
+  { key: 'beat', label: '드럼 (Beat)', icon: 'equalizer', cls: 'active-0' },
+  { key: 'bass', label: '베이스 (Bass)', icon: 'electric_bolt', cls: 'active-1' },
+  { key: 'chords', label: '신스/건반 (Chords)', icon: 'piano', cls: 'active-2' },
+  { key: 'lead', label: '리드 악기 (Lead)', icon: 'star', cls: 'active-3' },
+  { key: 'vocal', label: '보컬 (Melody)', icon: 'mic', cls: 'active-4' }
+];
+  
+const CHAT_BY_STEP = {
+  feeling: "안녕하세요! 물고기 잡는 법을 배우는 <strong>Muboxing</strong>에 오셨습니다.<br><br>첫 번째 단계인 <strong>'감상(Feeling)'</strong>을 unboxing 해봅시다.<br>좌측 화면에 곡 정보를 입력해주세요.",
+  beat: "좋아요! 이제 비트를 뜯어볼 차례예요. 음악을 들으며 주요한 드럼이 찍히는 리듬 패턴을 메모해보세요.",
+  melody: "비트 감각 좋은데요? 이번엔 탑라인 멜로디의 특징이나 인상 깊었던 화성(코드) 진행을 메모해보세요.",
+  structure: "상단 영상에서 <strong>음악을 바로 들으며</strong>, 파트별 어떤 악기가 들어오고 빠지는지 그리드에 직접 칠해보세요. 우측 상단의 화살표(◀▶)로 섹션 순서도 바꿀 수 있습니다!",
+  feedback: "여기까지 오시느라 고생했어요! 지금까지 관찰한 걸 내 창작에 어떻게 적용할지 적어보시고 <strong>✨ AI 튜터 피드백</strong>을 받아보세요.",
+};
+  
+const state = {
+  step: 'feeling',
+  visited: new Set(),
+  songInfo: { title: 'https://www.youtube.com/watch?v=rCeM57e2BfU', artist: 'DEAN, Heize', genre: 'R&B / Soul', youtubeId: 'rCeM57e2BfU' },
+  level: 'beginner',
+  grid: {},
+  inference: '',
+  application: '',
+  analysisId: null,
+  beatPattern: new Array(8).fill(false),
+  melodyPattern: {},
+};
+
+const MELODY_SECTIONS = ['Intro', 'Verse 1', 'Chorus', 'Verse 2', 'Outro'];
+
+const container = document.getElementById('step-container');
+const greeting = document.getElementById('tutor-greeting');
+const sideSongLabel = document.getElementById('side-song-label');
+
+/* ===================== Backend API / Auth ===================== */
+const API_BASE = 'http://127.0.0.1:8000';
+
+let currentUser = null;
+let authToken = localStorage.getItem('muboxing_token') || null;
+let authMode = 'login';
+let pendingNextStep = null;
+
+async function authFetch(path, options = {}) {
+  const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+  if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+  const res = await fetch(API_BASE + path, Object.assign({}, options, { headers }));
+  if (!res.ok) {
+    let detail = res.statusText;
+    try { detail = (await res.json()).detail || detail; } catch (e) {}
+    throw new Error(detail);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+function updateAuthUI() {
+  const guest = document.getElementById('nav-auth-guest');
+  const user = document.getElementById('nav-auth-user');
+  if (currentUser) {
+    guest.classList.add('hidden');
+    user.classList.remove('hidden');
+    user.classList.add('flex');
+    document.getElementById('nav-auth-nickname').textContent = currentUser.nickname;
+  } else {
+    guest.classList.remove('hidden');
+    user.classList.remove('flex');
+    user.classList.add('hidden');
+  }
+}
+
+async function restoreSession() {
+  if (!authToken) return;
+  try {
+    currentUser = await authFetch('/auth/me');
+    updateAuthUI();
+  } catch (e) {
+    authToken = null;
+    localStorage.removeItem('muboxing_token');
+  }
+}
+
+function openAuthModal() {
+  document.getElementById('auth-modal').classList.remove('hidden');
+  document.getElementById('auth-modal').classList.add('flex');
+  document.getElementById('auth-error').classList.add('hidden');
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').classList.add('hidden');
+  document.getElementById('auth-modal').classList.remove('flex');
+  pendingNextStep = null;
+}
+
+function setAuthTab(mode) {
+  authMode = mode;
+  document.getElementById('auth-tab-login').classList.toggle('bg-primary', mode === 'login');
+  document.getElementById('auth-tab-login').classList.toggle('text-white', mode === 'login');
+  document.getElementById('auth-tab-login').classList.toggle('bg-white/60', mode !== 'login');
+  document.getElementById('auth-tab-login').classList.toggle('text-primary', mode !== 'login');
+  document.getElementById('auth-tab-register').classList.toggle('bg-primary', mode === 'register');
+  document.getElementById('auth-tab-register').classList.toggle('text-white', mode === 'register');
+  document.getElementById('auth-tab-register').classList.toggle('bg-white/60', mode !== 'register');
+  document.getElementById('auth-tab-register').classList.toggle('text-primary', mode !== 'register');
+  document.getElementById('auth-nickname-field').classList.toggle('hidden', mode !== 'register');
+  document.getElementById('auth-submit-btn').textContent = mode === 'register' ? '회원가입' : '로그인';
+  document.getElementById('auth-error').classList.add('hidden');
+}
+
+async function submitAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const nickname = document.getElementById('auth-nickname').value.trim();
+  const errBox = document.getElementById('auth-error');
+  errBox.classList.add('hidden');
+
+  try {
+    const path = authMode === 'register' ? '/auth/register' : '/auth/login';
+    const body = authMode === 'register' ? { email, password, nickname } : { email, password };
+    const res = await authFetch(path, { method: 'POST', body: JSON.stringify(body) });
+    authToken = res.access_token;
+    currentUser = res.user;
+    localStorage.setItem('muboxing_token', authToken);
+    updateAuthUI();
+    const next = pendingNextStep;
+    closeAuthModal();
+    if (next) {
+      goToStep(next);
+    }
+  } catch (e) {
+    errBox.textContent = e.message || '오류가 발생했어요.';
+    errBox.classList.remove('hidden');
+  }
+}
+
+function logout() {
+  authToken = null;
+  currentUser = null;
+  localStorage.removeItem('muboxing_token');
+  updateAuthUI();
+}
+
+function requireLogin(nextStepIfBlocked) {
+  if (currentUser) return true;
+  pendingNextStep = nextStepIfBlocked || null;
+  setAuthTab('login');
+  openAuthModal();
+  return false;
+}
+
+/* --- Utilities --- */
+function extractYouTubeID(url) {
+  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[7].length === 11) ? match[7] : null;
+}
+
+const LEVELS = [
+  { id: 'beginner', label: '입문', desc: '용어 설명과 함께 천천히, 기본 관찰 위주로 진행해요.' },
+  { id: 'intermediate', label: '중급', desc: '용어는 이미 아는 편, 스스로 패턴을 찾는 데 집중해요.' },
+  { id: 'advanced', label: '심화', desc: '설명 없이 바로 세밀한 관찰과 적용까지 나가요.' },
+];
+
+function renderLevelOptions() {
+  const wrap = document.getElementById('level-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = LEVELS.map(l => `
+    <button type="button" class="level-option text-left border rounded-xl p-4 transition-all ${state.level === l.id ? 'bg-primary text-white border-primary shadow-md' : 'bg-white/50 border-white/80 text-on-surface hover:bg-white/80'}" data-level="${l.id}" onclick="selectLevel('${l.id}')">
+      <div class="font-bold text-sm mb-1">${l.label}</div>
+      <div class="text-xs ${state.level === l.id ? 'text-white/85' : 'text-on-surface-variant'} font-medium">${l.desc}</div>
+    </button>
+  `).join('');
+}
+
+function selectLevel(levelId) {
+  state.level = levelId;
+  renderLevelOptions();
+}
+
+/* --- Beat step: 8-slot kick emphasis grid --- */
+function renderBeatGrid() {
+  const wrap = document.getElementById('beat-grid');
+  if (!wrap) return;
+  wrap.innerHTML = state.beatPattern.map((active, i) => `
+    <button type="button" class="aspect-square rounded-lg border-2 flex items-center justify-center font-mono text-xs font-bold transition-all ${active ? 'bg-primary text-white border-primary shadow-md scale-105' : 'bg-white/50 border-white/70 text-on-surface-variant hover:bg-white/80'}" onclick="toggleBeatStep(${i})">${i + 1}</button>
+  `).join('');
+}
+
+function toggleBeatStep(i) {
+  state.beatPattern[i] = !state.beatPattern[i];
+  renderBeatGrid();
+}
+
+/* --- Melody step: section-by-section melody-line toggle --- */
+function renderMelodyGrid() {
+  const wrap = document.getElementById('melody-grid');
+  if (!wrap) return;
+  wrap.innerHTML = MELODY_SECTIONS.map(sec => `
+    <button type="button" class="h-12 rounded-lg border-2 text-xs font-bold transition-all ${state.melodyPattern[sec] ? 'bg-secondary text-white border-secondary shadow-md' : 'bg-white/50 border-white/70 text-on-surface-variant hover:bg-white/80'}" onclick="toggleMelodySection('${sec}')">${sec}</button>
+  `).join('');
+}
+
+function toggleMelodySection(sec) {
+  state.melodyPattern[sec] = !state.melodyPattern[sec];
+  renderMelodyGrid();
+}
+
+function fillMockData() {
+  document.getElementById('s-title').value = "https://www.youtube.com/watch?v=rCeM57e2BfU"; 
+  document.getElementById('s-artist').value = "DEAN, Heize";
+  
+  // Update state
+  state.songInfo.title = "https://www.youtube.com/watch?v=rCeM57e2BfU";
+  state.songInfo.youtubeId = "rCeM57e2BfU";
+  state.songInfo.artist = "DEAN, Heize";
+  
+  // Fill sample grid
+  state.grid = {
+    '0-Intro': false, '1-Intro': false, '2-Intro': true, '3-Intro': false, '4-Intro': false,
+    '0-Verse 1': true, '1-Verse 1': true, '2-Verse 1': true, '3-Verse 1': false, '4-Verse 1': true,
+    '0-Pre-Chorus': false, '1-Pre-Chorus': true, '2-Pre-Chorus': true, '3-Pre-Chorus': false, '4-Pre-Chorus': true,
+    '0-Chorus': true, '1-Chorus': true, '2-Chorus': true, '3-Chorus': true, '4-Chorus': true
+  };
+  state.inference = "후렴(Chorus) 직전 Pre-Chorus 파트에서 드럼 트랙을 완전히 비워버리는 수법을 써서, 다음 파트에서 모든 악기가 한꺼번에 터질 때의 반전을 극대화했습니다.";
+  state.application = "내가 기획하는 다음 R&B 곡에도 클라이맥스 진입 직전 마지막 1마디를 완전히 비워버리는 '드롭아웃' 트랙 설계를 적용해보겠습니다.";
+  
+  // Visual feedback
+  appendTutorChat(`샘플 데이터가 로드되었습니다! 이제 <strong>[다음: Beat 언박싱]</strong> 버튼을 눌러 다음 단계로 넘어가보세요.`);
+}
+
+/* --- Stepper Navigation --- */
+async function ensureAnalysisSession() {
+  if (state.analysisId) return true;
+  if (!requireLogin('beat')) return false;
+  try {
+    const res = await authFetch('/analyses', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: state.songInfo.title,
+        artist: state.songInfo.artist,
+        genre: state.songInfo.genre,
+        level: state.level,
+        youtube_url: state.songInfo.title,
+        video_id: state.songInfo.youtubeId,
+      }),
+    });
+    state.analysisId = res.id;
+    return true;
+  } catch (e) {
+    appendTutorChat(`<span style="color:#E44C34">분석 세션을 만들지 못했어요: ${e.message}</span>`);
+    return false;
+  }
+}
+
+async function persistLeavingStep(leavingStep, nextStep) {
+  if (!state.analysisId) return;
+  const payload = { current_step: nextStep };
+  if (leavingStep === 'beat') {
+    payload.note_beat = document.getElementById('note-beat')?.value ?? '';
+    payload.beat_pattern_json = state.beatPattern;
+  }
+  if (leavingStep === 'melody') {
+    payload.note_melody = document.getElementById('note-melody')?.value ?? '';
+    payload.melody_pattern_json = state.melodyPattern;
+  }
+  if (leavingStep === 'structure') {
+    payload.note_structure = state.inference;
+    payload.note_apply = state.application;
+    payload.sections_json = SECTIONS;
+    payload.grid_json = state.grid;
+  }
+  try {
+    await authFetch(`/analyses/${state.analysisId}`, { method: 'PATCH', body: JSON.stringify(payload) });
+  } catch (e) {
+    console.warn('저장 실패', e);
+  }
+}
+
+async function goToStep(nextStep) {
+  const leavingStep = state.step;
+
+  // Save current step data before leaving
+  if(state.step === 'structure') {
+     const inferEl = document.getElementById('note-structure');
+     const applyEl = document.getElementById('note-apply');
+     if(inferEl) state.inference = inferEl.value;
+     if(applyEl) state.application = applyEl.value;
+  } else if(state.step === 'feeling') {
+     const titleEl = document.getElementById('s-title').value.trim();
+     state.songInfo.title = titleEl;
+     state.songInfo.artist = document.getElementById('s-artist').value;
+     state.songInfo.genre = document.getElementById('s-genre').value;
+     // Extract Youtube ID right away
+     let extId = extractYouTubeID(titleEl) || 'rCeM57e2BfU';
+     state.songInfo.youtubeId = extId;
+     sideSongLabel.innerText = `${state.songInfo.artist} - ${titleEl.substring(0,15)}...`;
+  }
+
+  // Leaving Feeling for the first time: create (and require login for) the analysis session
+  if (leavingStep === 'feeling' && nextStep !== 'feeling') {
+    const ok = await ensureAnalysisSession();
+    if (!ok) return; // login modal opened, or creation failed — stay on Feeling
+  }
+
+  await persistLeavingStep(leavingStep, nextStep);
+
+  // Update State
+  state.step = nextStep;
+
+  // Render Target Step Logic
+  if (nextStep === 'beat') {
+     renderBeatGrid();
+  } else if (nextStep === 'melody') {
+     renderMelodyGrid();
+  } else if (nextStep === 'structure') {
+     document.getElementById('mode-badge').innerText = state.level.toUpperCase() + ' MODE';
+     renderDawGrid();
+  }
+
+  // DOM CSS Toggling
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  const targetPanel = document.getElementById(`step-${nextStep}`);
+  if(targetPanel) targetPanel.classList.add('active');
+
+  document.querySelectorAll('.side-step-btn').forEach(b => {
+    if(b.dataset.step === nextStep) {
+      b.classList.add('active', 'bg-primary', 'text-white', 'shadow-sm');
+      b.classList.remove('text-on-surface-variant', 'hover:bg-white/40');
+    } else {
+      b.classList.remove('active', 'bg-primary', 'text-white', 'shadow-sm');
+      b.classList.add('text-on-surface-variant', 'hover:bg-white/40');
+    }
+  });
+
+  document.getElementById('progress-bar').style.width = (PROGRESS[nextStep] || 20) + '%';
+
+  // Tutor Chat Trigger
+  if (!state.visited.has(nextStep) && CHAT_BY_STEP[nextStep]) {
+    appendTutorChat(CHAT_BY_STEP[nextStep]);
+  }
+  state.visited.add(nextStep);
+
+  // Scroll step container to top
+  const stepContainer = document.getElementById('step-container');
+  if(stepContainer) stepContainer.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* --- Structure Grid (With Preset Add & Reorder) --- */
+function renderDawGrid() {
+  const wrap = document.getElementById('interactive-area');
+  if(!wrap) return;
+  
+  let gridHTML = `
+    <div class="w-full overflow-x-auto bg-white/50 border border-white/80 rounded-2xl p-6 shadow-inner mb-8">
+      
+      <div class="mb-4 flex flex-wrap gap-2 items-center justify-between">
+        <div class="flex flex-wrap gap-2 items-center">
+          <label class="flex items-center gap-2 font-bold text-primary text-sm mr-2">
+            <span class="material-symbols-outlined text-base">view_column</span> 섹션 버튼으로 쉽게 추가:
+          </label>
+          <button class="bg-white/60 hover:bg-white/90 border border-white text-primary px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm" onclick="addSectionPreset('Intro')">+ Intro</button>
+          <button class="bg-white/60 hover:bg-white/90 border border-white text-primary px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm" onclick="addSectionPreset('Verse')">+ Verse</button>
+          <button class="bg-white/60 hover:bg-white/90 border border-white text-primary px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm" onclick="addSectionPreset('Pre-Chorus')">+ Pre-Chorus</button>
+          <button class="bg-white/60 hover:bg-white/90 border border-white text-primary px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm" onclick="addSectionPreset('Chorus')">+ Chorus</button>
+          <button class="bg-white/60 hover:bg-white/90 border border-white text-primary px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm" onclick="addSectionPreset('Bridge')">+ Bridge</button>
+          <button class="bg-white/60 hover:bg-white/90 border border-white text-primary px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm" onclick="addSectionPreset('Outro')">+ Outro</button>
+        </div>
+        <button id="suggest-structure-btn" class="bg-gradient-to-r from-lavender-mist to-primary-container text-primary px-4 py-1.5 rounded-full text-xs font-bold shadow-sm hover:opacity-90 transition-all flex items-center gap-1.5" onclick="suggestStructure()">
+          <span class="material-symbols-outlined text-base">auto_awesome</span> AI가 구조 초안 제안
+        </button>
+      </div>
+
+      <table class="daw-grid whitespace-nowrap w-full">
+        <tr>
+          <th class="text-left pl-4 w-[160px]">TRACKS \\ SECTION</th>
+          ${SECTIONS.map((s, i) => `
+            <th class="relative group text-center px-2 min-w-[120px]">
+              <div class="flex items-center justify-center gap-1.5">
+                <button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-0" onclick="moveSection(${i}, -1)" ${i===0?'disabled':''} title="왼쪽으로 이동"><span class="material-symbols-outlined text-[16px]">arrow_left</span></button>
+                <span>${s}</span>
+                <button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-0" onclick="moveSection(${i}, 1)" ${i===SECTIONS.length-1?'disabled':''} title="오른쪽으로 이동"><span class="material-symbols-outlined text-[16px]">arrow_right</span></button>
+              </div>
+              <button class="absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-kitsch-red opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full w-5 h-5 flex items-center justify-center shadow-sm" onclick="removeSection(${i})" title="섹션 삭제">
+                <span class="material-symbols-outlined text-[12px]">close</span>
+              </button>
+            </th>
+          `).join('')}
+        </tr>
+  `;
+
+  TRACKS.forEach((track, tIdx) => {
+    gridHTML += `<tr><td class="track-name"><span class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] opacity-70">${track.icon}</span>${track.label}</span></td>`;
+    SECTIONS.forEach((s) => {
+      const key = `${tIdx}-${s}`;
+      const isActive = state.grid[key] ? track.cls : '';
+      gridHTML += `<td class="cell ${isActive}" onclick="toggleDawGrid('${key}')"></td>`;
+    });
+    gridHTML += `</tr>`;
+  });
+  gridHTML += `</table></div>`;
+
+  wrap.innerHTML = gridHTML;
+
+  // Populate textareas if they exist
+  const inferEl = document.getElementById('note-structure');
+  const applyEl = document.getElementById('note-apply');
+  if(inferEl) inferEl.value = state.inference;
+  if(applyEl) applyEl.value = state.application;
+
+  // Video Injection Logic (Removed Autoplay to fix 150/153 errors on specific music videos)
+  const container = document.getElementById('video-container');
+  if(container) {
+    container.innerHTML = `
+      <iframe class="w-full h-full" src="https://www.youtube.com/embed/${state.songInfo.youtubeId}?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    `;
+  }
+}
+
+window.toggleDawGrid = function(key) {
+  state.grid[key] = !state.grid[key];
+  renderDawGrid();
+}
+
+window.addSectionPreset = function(name) {
+  let finalName = name;
+  let count = 1;
+  while(SECTIONS.includes(finalName)) { count++; finalName = `${name} ${count}`; }
+  SECTIONS.push(finalName);
+  renderDawGrid();
+}
+
+window.removeSection = function(idx) {
+  const secName = SECTIONS[idx];
+  SECTIONS.splice(idx, 1);
+  TRACKS.forEach((_, tIdx) => delete state.grid[`${tIdx}-${secName}`]);
+  renderDawGrid();
+}
+
+// 🌟 좌우 순서 변경 기능 (드래그앤드롭 대신 직관적인 버튼 방식)
+window.moveSection = function(idx, direction) {
+  const newIdx = idx + direction;
+  if(newIdx < 0 || newIdx >= SECTIONS.length) return; // Out of bounds
+  
+  // Swap logic
+  const temp = SECTIONS[idx];
+  SECTIONS[idx] = SECTIONS[newIdx];
+  SECTIONS[newIdx] = temp;
+  
+  renderDawGrid();
+}
+
+async function suggestStructure() {
+  if (!requireLogin()) return;
+  if (!state.analysisId) { appendTutorChat('<span style="color:#E44C34">먼저 Feeling 단계를 완료해주세요.</span>'); return; }
+
+  const btn = document.getElementById('suggest-structure-btn');
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="w-3.5 h-3.5 rounded-full border-2 border-primary border-t-transparent animate-spin inline-block"></span> 분석 중...';
+
+  try {
+    const result = await authFetch(`/analyses/${state.analysisId}/suggest-structure`, { method: 'POST' });
+    SECTIONS = result.sections;
+    state.grid = result.grid;
+    renderDawGrid();
+    appendTutorChat(`✨ AI가 구조 초안을 채워봤어요. ${result.note || ''}<br>그리드를 직접 다듬어보세요!`);
+  } catch (e) {
+    appendTutorChat(`<span style="color:#E44C34">구조 초안 제안에 실패했어요: ${e.message}</span>`);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+  }
+}
+
+/* --- Chat & Feedback --- */
+function appendTutorChat(htmlMsg) {
+  greeting.innerHTML += `
+    <div class="bg-white/80 backdrop-blur-lg border border-white/60 rounded-2xl rounded-bl-sm p-4 shadow-sm text-sm text-on-surface animate-slide-down leading-relaxed self-start w-[90%]">
+      ${htmlMsg}
+    </div>
+  `;
+  greeting.scrollTop = greeting.scrollHeight;
+}
+
+function appendUserChat(htmlMsg) {
+  greeting.innerHTML += `
+    <div class="bg-primary/20 backdrop-blur-lg border border-primary/30 rounded-2xl rounded-br-sm p-4 shadow-sm text-sm text-on-surface animate-slide-down leading-relaxed self-end w-[85%]">
+      ${htmlMsg}
+    </div>
+  `;
+  greeting.scrollTop = greeting.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const inputEl = document.getElementById('chat-input');
+  const text = inputEl.value.trim();
+  if (!text) return;
+
+  appendUserChat(text);
+  inputEl.value = '';
+
+  const loadingId = 'loading-' + Date.now();
+  greeting.innerHTML += `
+    <div id="${loadingId}" class="bg-white/80 backdrop-blur-lg border border-white/60 rounded-2xl rounded-bl-sm p-4 shadow-sm text-sm text-on-surface animate-slide-down self-start w-[90%]">
+      <span class="flex items-center gap-2"><span class="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></span> 튜터가 답변을 고민하고 있습니다...</span>
+    </div>
+  `;
+  greeting.scrollTop = greeting.scrollHeight;
+
+  try {
+    const res = await authFetch('/ai/chat', { method: 'POST', body: JSON.stringify({ message: text, step: state.step }) });
+    document.getElementById(loadingId)?.remove();
+    appendTutorChat(res.reply);
+  } catch (e) {
+    document.getElementById(loadingId)?.remove();
+    appendTutorChat(`<span style="color:#E44C34">답변을 가져오지 못했어요: ${e.message}</span>`);
+  }
+}
+
+async function sendGlobalChatMessage(overrideText) {
+  const inputEl = document.getElementById('global-chat-input');
+  const text = overrideText || inputEl.value.trim();
+  if (!text) return;
+
+  const log = document.getElementById('global-chat-log');
+  log.innerHTML += `
+    <div class="bg-primary/20 border border-primary/30 rounded-2xl rounded-br-sm p-5 text-[15px] font-medium text-on-surface shadow-sm self-end max-w-[85%] leading-relaxed animate-slide-down">
+      ${text}
+    </div>
+  `;
+  if(!overrideText) inputEl.value = '';
+  log.scrollTop = log.scrollHeight;
+
+  const loadingId = 'loading-' + Date.now();
+  log.innerHTML += `
+    <div id="${loadingId}" class="bg-white/80 border border-white/60 rounded-2xl rounded-bl-sm p-5 text-[15px] font-medium text-on-surface shadow-sm self-start max-w-[85%] leading-relaxed animate-slide-down">
+      <span class="flex items-center gap-2"><span class="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></span> 튜터가 답변을 고민하고 있습니다...</span>
+    </div>
+  `;
+  log.scrollTop = log.scrollHeight;
+
+  try {
+    const res = await authFetch('/ai/chat', { method: 'POST', body: JSON.stringify({ message: text }) });
+    document.getElementById(loadingId)?.remove();
+    log.innerHTML += `
+      <div class="bg-white/80 border border-white/60 rounded-2xl rounded-bl-sm p-5 text-[15px] font-medium text-on-surface shadow-sm self-start max-w-[85%] leading-relaxed animate-slide-down">
+        ${res.reply}
+      </div>
+    `;
+    log.scrollTop = log.scrollHeight;
+  } catch (e) {
+    document.getElementById(loadingId)?.remove();
+    log.innerHTML += `
+      <div class="bg-white/80 border border-white/60 rounded-2xl rounded-bl-sm p-5 text-[15px] font-medium text-kitsch-red shadow-sm self-start max-w-[85%] leading-relaxed animate-slide-down">
+        답변을 가져오지 못했어요: ${e.message}
+      </div>
+    `;
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+async function getAIFeedback() {
+  if (!requireLogin()) return;
+  if (!state.analysisId) { appendTutorChat('<span style="color:#E44C34">먼저 Feeling 단계부터 진행해주세요.</span>'); return; }
+
+  const applyEl = document.getElementById('note-apply');
+  if(applyEl) state.application = applyEl.value;
+  await persistLeavingStep('structure', 'feedback');
+
+  const popup = document.getElementById('ai-feedback-box');
+  const content = document.getElementById('ai-feedback-content');
+  if(popup) {
+    popup.classList.remove('hidden');
+    content.innerHTML = '<span class="flex items-center gap-2"><span class="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></span> AI가 기획서를 분석 중입니다...</span>';
+  }
+
+  document.getElementById('feedback-btn').disabled = true;
+
+  const loadingId = 'loading-' + Date.now();
+  greeting.innerHTML += `
+    <div id="${loadingId}" class="bg-white/80 backdrop-blur-lg border border-white/60 rounded-2xl rounded-bl-sm p-4 shadow-sm text-sm text-on-surface animate-slide-down self-start w-[90%]">
+      <span class="flex items-center gap-2"><span class="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></span> 작성하신 기획안을 분석하고 있습니다...</span>
+    </div>
+  `;
+  greeting.scrollTop = greeting.scrollHeight;
+
+  try {
+    const res = await authFetch(`/analyses/${state.analysisId}/feedback`, { method: 'POST' });
+    document.getElementById(loadingId)?.remove();
+    if(popup) content.innerHTML = res.ai_feedback;
+    appendTutorChat(res.ai_feedback);
+    document.getElementById('finish-btn').disabled = false;
+  } catch (e) {
+    document.getElementById(loadingId)?.remove();
+    if(popup) content.innerHTML = `<span style="color:#E44C34">피드백을 가져오지 못했어요: ${e.message}</span>`;
+  } finally {
+    document.getElementById('feedback-btn').disabled = false;
+  }
+}
+
+async function completeAnalysis() {
+  const inferEl = document.getElementById('note-structure');
+  const applyEl = document.getElementById('note-apply');
+  if(inferEl) state.inference = inferEl.value;
+  if(applyEl) state.application = applyEl.value;
+
+  if (state.analysisId) {
+    try { await authFetch(`/analyses/${state.analysisId}/complete`, { method: 'POST' }); }
+    catch (e) { console.warn('완료 처리 실패', e); }
+  }
+
+  // Populate Done Screen
+  document.getElementById('done-subtitle').innerText = `${state.songInfo.artist} - ${state.songInfo.title.substring(0,20)}...`;
+  document.getElementById('done-infer').innerText = state.inference || "작성된 내용이 없습니다.";
+  document.getElementById('done-apply').innerText = state.application || "작성된 내용이 없습니다.";
+
+  // Show Full Screen Overlay
+  document.getElementById('step-done').classList.remove('hidden');
+}
+
+function resetToHome() {
+  // Hide overlay
+  document.getElementById('step-done').classList.add('hidden');
+  
+  // Reset state
+  state.step = 'feeling';
+  state.visited = new Set(['feeling']);
+  state.grid = {};
+  state.inference = '';
+  state.application = '';
+  state.analysisId = null;
+  state.level = 'beginner';
+  SECTIONS = ['Intro', 'Verse 1', 'Pre-Chorus', 'Chorus', 'Outro'];
+
+  // Clear inputs
+  document.getElementById('s-title').value = '';
+  document.getElementById('s-artist').value = '';
+  document.getElementById('s-genre').selectedIndex = 0;
+  document.getElementById('note-beat').value = '';
+  document.getElementById('note-melody').value = '';
+  const noteStructureEl = document.getElementById('note-structure');
+  if (noteStructureEl) noteStructureEl.value = '';
+  renderLevelOptions();
+  
+  const videoCont = document.getElementById('video-container');
+  if(videoCont) videoCont.innerHTML = '';
+  
+  const fbBox = document.getElementById('ai-feedback-box');
+  if(fbBox) fbBox.classList.add('hidden');
+  
+  document.getElementById('feedback-btn').disabled = false;
+  document.getElementById('finish-btn').disabled = true;
+  greeting.innerHTML = '';
+  
+  navigateTo('home');
+}
+
+// Init
+document.addEventListener("DOMContentLoaded", () => {
+  initScrollAnimations();
+  renderLevelOptions();
+  restoreSession();
+  navigateTo('home');
+});
+</script>
+</body>
+</html>
