@@ -230,7 +230,6 @@
   <div class="hidden lg:flex gap-8">
     <a class="top-nav-item active text-primary font-bold border-b-2 border-primary pb-1 font-label-md transition-colors" data-route="home" href="#" onclick="event.preventDefault(); navigateTo('home')">Home</a>
     <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="analysis" href="#" onclick="event.preventDefault(); navigateTo('analysis')">Analysis</a>
-    <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="reference" href="#" onclick="event.preventDefault(); navigateTo('reference')">Reference</a>
     <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="library" href="#" onclick="event.preventDefault(); navigateTo('library')">Library</a>
     <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="tutor" href="#" onclick="event.preventDefault(); navigateTo('tutor')">Tutor</a>
     <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="community" href="#" onclick="event.preventDefault(); navigateTo('community')">Community</a>
@@ -458,11 +457,40 @@
       <div class="flex-1 flex flex-col gap-6 min-w-0 bg-white/30 backdrop-blur-xl border border-white/50 rounded-3xl p-4 md:p-8 relative shadow-sm h-[80vh] overflow-y-auto" id="step-container">
 
         <div class="w-full h-1.5 bg-white/60 rounded-full overflow-hidden mb-2 shrink-0">
-          <div id="progress-bar" class="h-full bg-gradient-to-r from-lavender-mist to-primary rounded-full transition-all duration-300" style="width: 20%"></div>
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-lavender-mist to-primary rounded-full transition-all duration-300" style="width: 0%"></div>
         </div>
 
+        <!-- STEP 0: MODE SELECT -->
+        <section id="step-modeselect" class="step-panel active">
+          <div class="text-center mb-10 mt-2">
+            <span class="inline-block bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold px-3 py-1 rounded-full mb-4 shadow-sm tracking-wider">START UNBOXING</span>
+            <h2 class="font-display-lg text-2xl md:text-3xl text-primary tracking-tight mb-2">어떤 방식으로 언박싱할까요?</h2>
+            <p class="text-sm text-on-surface-variant font-medium">세 가지 모드 중 하나를 골라 시작해보세요. 언제든 Analysis 탭으로 돌아와 다시 고를 수 있어요.</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
+            <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer" onclick="goToStep('feeling')">
+              <div class="w-11 h-11 rounded-xl bg-primary/15 text-primary flex items-center justify-center mb-4"><span class="material-symbols-outlined">route</span></div>
+              <h3 class="font-display-lg font-bold text-lg text-on-surface mb-2">프레임워크</h3>
+              <p class="text-[13px] text-on-surface-variant leading-relaxed mb-3">Feeling→Beat→Melody→Structure→Feedback 5단계를 순서대로 밟으며 스스로 관찰하고 기록해요.</p>
+              <span class="text-xs font-bold text-primary">직접 분석하며 배우기 →</span>
+            </div>
+            <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer" onclick="startReferenceMode('fullscore')">
+              <div class="w-11 h-11 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center mb-4"><span class="material-symbols-outlined">bar_chart</span></div>
+              <h3 class="font-display-lg font-bold text-lg text-on-surface mb-2">풀스코어</h3>
+              <p class="text-[13px] text-on-surface-variant leading-relaxed mb-3">이미 분석된 레퍼런스 곡을 초급·중급·고급 DAW 타임라인 뷰로 뜯어봐요.</p>
+              <span class="text-xs font-bold text-secondary">레퍼런스 곡 둘러보기 →</span>
+            </div>
+            <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer" onclick="startReferenceMode('earcopy')">
+              <div class="w-11 h-11 rounded-xl bg-tertiary/15 text-tertiary flex items-center justify-center mb-4"><span class="material-symbols-outlined">graphic_eq</span></div>
+              <h3 class="font-display-lg font-bold text-lg text-on-surface mb-2">이어카피</h3>
+              <p class="text-[13px] text-on-surface-variant leading-relaxed mb-3">BPM 탭 게임과 근음·코드 퀴즈로 직접 듣고 맞히는 귀 훈련을 해봐요.</p>
+              <span class="text-xs font-bold text-tertiary">퀴즈로 훈련하기 →</span>
+            </div>
+          </div>
+        </section>
+
         <!-- STEP 1: FEELING -->
-        <section id="step-feeling" class="step-panel active">
+        <section id="step-feeling" class="step-panel">
           <div class="inline-block bg-secondary-container text-on-secondary-container px-4 py-1.5 rounded-full font-label-md shadow-md text-sm border border-white mb-6">Step 1</div>
           <h2 class="font-display-lg text-2xl md:text-3xl text-primary mb-8 tracking-tight">Feeling (감상) unboxing</h2>
           
@@ -1102,7 +1130,7 @@ function navigateTo(route) {
   if (route === 'analysis') {
     newActionBtn.classList.add('hidden');
     sidebarToggle.classList.remove('hidden'); // Analysis 에서만 햄버거 메뉴 보임
-    if(!state.visited.has(state.step)) goToStep('feeling');
+    if(!state.visited.has(state.step)) goToStep(state.step);
   } else {
     newActionBtn.classList.remove('hidden');
     sidebarToggle.classList.add('hidden'); // 다른 라우트에서는 숨김
@@ -1329,7 +1357,7 @@ document.getElementById('sidebar-toggle').addEventListener('click', () => {
 });
 
 /* ===================== Muboxing — Analysis App State & Logic ===================== */
-const PROGRESS = { feeling: 20, beat: 40, melody: 60, structure: 80, feedback: 100 };
+const PROGRESS = { modeselect: 0, feeling: 20, beat: 40, melody: 60, structure: 80, feedback: 100 };
   
 let SECTIONS = ['Intro', 'Verse 1', 'Pre-Chorus', 'Chorus', 'Outro'];
 const TRACKS = [
@@ -1349,7 +1377,7 @@ const CHAT_BY_STEP = {
 };
   
 const state = {
-  step: 'feeling',
+  step: 'modeselect',
   visited: new Set(),
   songInfo: { title: 'https://www.youtube.com/watch?v=rCeM57e2BfU', artist: 'DEAN, Heize', genre: 'R&B / Soul', youtubeId: 'rCeM57e2BfU' },
   level: 'beginner',
@@ -1957,8 +1985,8 @@ function resetToHome() {
   document.getElementById('step-done').classList.add('hidden');
   
   // Reset state
-  state.step = 'feeling';
-  state.visited = new Set(['feeling']);
+  state.step = 'modeselect';
+  state.visited = new Set(['modeselect']);
   state.grid = {};
   state.inference = '';
   state.application = '';
@@ -1985,7 +2013,17 @@ function resetToHome() {
   document.getElementById('feedback-btn').disabled = false;
   document.getElementById('finish-btn').disabled = true;
   greeting.innerHTML = '';
-  
+
+  // Reset stepper UI back to the mode-select screen
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('step-modeselect').classList.add('active');
+  document.querySelectorAll('.side-step-btn').forEach(b => {
+    b.classList.remove('active', 'bg-primary', 'text-white', 'shadow-sm');
+    b.classList.add('text-on-surface-variant', 'hover:bg-white/40');
+  });
+  document.getElementById('progress-bar').style.width = '0%';
+  refForcedVersion = null;
+
   navigateTo('home');
 }
 
@@ -2239,7 +2277,23 @@ function refSelectSong(songId){
 function refOpenSong(songId){
   document.getElementById('ref-version-title').textContent = refCurrentSong.title;
   document.getElementById('ref-version-artist').textContent = refCurrentSong.artist;
-  refShowStage('version');
+  if (refForcedVersion) {
+    if (refCurrentSong && refCurrentSong.id) refSetSongData(refCurrentSong.id);
+    refLoadPlayerUI();
+    refShowStage('player');
+    refSwitchVersion(refForcedVersion);
+    refSetupMedia();
+  } else {
+    refShowStage('version');
+  }
+}
+
+/* --- Entry point from the unified mode-select screen (Analysis view) --- */
+let refForcedVersion = null;
+function startReferenceMode(mode){
+  refForcedVersion = mode;
+  navigateTo('reference');
+  refShowStage('select');
 }
 
 function refSelectVersion(ver){
