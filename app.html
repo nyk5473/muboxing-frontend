@@ -165,6 +165,50 @@
     body:not([data-route="analysis"]) #left-sidebar { display: none !important; }
     body:not([data-route="analysis"]) #right-sidebar { display: none !important; }
     body:not([data-route="analysis"]) #main-content-wrapper { margin-left: 0 !important; }
+
+    /* ================= Reference (Fullscore / Earcopy) mode ================= */
+    .ref-page { display: none; }
+    .ref-page.active { display: block; animation: popIn 0.4s ease-out forwards; }
+    .ref-mode-panel { display: none; }
+    .ref-mode-panel.active { display: block; }
+
+    .ref-board { background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; overflow-x: auto; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+    .ref-board-inner { position: relative; min-width: 640px; }
+    .ref-ruler { display: grid; grid-template-columns: 100px 1fr; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .ref-ruler-label { padding: 10px 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #4c5a9d; display: flex; align-items: flex-end; text-transform: uppercase; letter-spacing: .08em; }
+    .ref-ruler-track { position: relative; height: 46px; }
+    .ref-section-mark { position: absolute; top: 0; bottom: 0; border-left: 1px solid rgba(0,0,0,0.08); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #1b1b20; padding: 8px 0 0 8px; cursor: pointer; transition: background .15s; }
+    .ref-section-mark:hover { background: rgba(76,90,157,0.06); }
+    .ref-section-mark .ref-time { display: block; margin-top: 2px; color: #767681; font-size: 9px; }
+    .ref-row { display: grid; grid-template-columns: 100px 1fr; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .ref-row:last-child { border-bottom: none; }
+    .ref-row-label { padding: 12px 14px; font-size: 12.5px; font-weight: 700; color: #1b1b20; display: flex; align-items: center; border-right: 1px solid rgba(0,0,0,0.05); }
+    .ref-row-track { position: relative; height: 52px; }
+    .ref-seg { position: absolute; top: 8px; bottom: 8px; border-radius: 6px; display: flex; align-items: center; padding: 0 10px; font-size: 10.5px; font-weight: 700; color: #fff; overflow: hidden; white-space: nowrap; }
+    .ref-seg.ref-ghost { background: transparent !important; border: 1px dashed rgba(0,0,0,0.25); color: #767681; }
+    .ref-playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: #4c5a9d; z-index: 5; pointer-events: none; }
+    .ref-row-track.ref-harmony { height: 70px; }
+    .ref-harm-seg { position: absolute; top: 6px; height: 26px; border-radius: 6px; display: flex; align-items: center; padding: 0 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: #fff; overflow: hidden; white-space: nowrap; }
+    .ref-harm-seg.ref-bottom { top: 38px; }
+    .ref-freq-cellwrap { position: absolute; top: 0; bottom: 0; display: flex; gap: 2px; padding: 5px; }
+    .ref-freq-col { flex: 1; display: flex; flex-direction: column-reverse; }
+    .ref-freq-bar { width: 100%; border-radius: 2px; opacity: .85; }
+
+    .ref-groove-grid { display: grid; grid-template-columns: repeat(16,1fr); gap: 3px; align-items: end; height: 70px; margin-bottom: 8px; }
+    .ref-step { position: relative; height: 100%; display: flex; flex-direction: column-reverse; }
+    .ref-hit { width: 100%; border-radius: 2px 2px 0 0; }
+    .ref-step-num { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #767681; text-align: center; margin-top: 3px; }
+
+    .ref-note-btn { padding: 14px 0; text-align: center; border-radius: 10px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1b1b20; font-family: 'JetBrains Mono', monospace; font-size: 13px; cursor: pointer; transition: all .15s; }
+    .ref-note-btn:hover { border-color: #4c5a9d; box-shadow: 0 0 0 2px rgba(76,90,157,0.15); }
+    .ref-note-btn.ref-selected { background: #4c5a9d; color: #fff; }
+    .ref-note-btn.ref-correct { background: #8DDFF6; color: #090710; }
+    .ref-note-btn.ref-wrong { background: transparent; color: #ba1a1a; border-color: #ba1a1a; }
+    .ref-quality-btn { padding: 16px 10px; text-align: center; border-radius: 10px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1b1b20; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all .15s; }
+    .ref-quality-btn:hover { border-color: #4c5a9d; box-shadow: 0 0 0 2px rgba(76,90,157,0.15); }
+    .ref-quality-btn.ref-selected { background: #4c5a9d; color: #fff; }
+    .ref-quality-btn.ref-correct { background: #8DDFF6; color: #090710; }
+    .ref-quality-btn.ref-wrong { background: transparent; color: #ba1a1a; border-color: #ba1a1a; }
 </style>
 </head>
 <body class="font-body-md antialiased relative overflow-x-hidden" data-route="home">
@@ -186,6 +230,7 @@
   <div class="hidden lg:flex gap-8">
     <a class="top-nav-item active text-primary font-bold border-b-2 border-primary pb-1 font-label-md transition-colors" data-route="home" href="#" onclick="event.preventDefault(); navigateTo('home')">Home</a>
     <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="analysis" href="#" onclick="event.preventDefault(); navigateTo('analysis')">Analysis</a>
+    <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="reference" href="#" onclick="event.preventDefault(); navigateTo('reference')">Reference</a>
     <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="library" href="#" onclick="event.preventDefault(); navigateTo('library')">Library</a>
     <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="tutor" href="#" onclick="event.preventDefault(); navigateTo('tutor')">Tutor</a>
     <a class="top-nav-item text-on-surface-variant hover:text-primary transition-colors font-label-md" data-route="community" href="#" onclick="event.preventDefault(); navigateTo('community')">Community</a>
@@ -734,6 +779,244 @@
         <p class="text-sm text-on-surface-variant font-medium">불러오는 중...</p>
       </div>
     </div>
+
+    <!-- ================= 5. REFERENCE VIEW (Fullscore 초/중/고급 + Earcopy) ================= -->
+    <div id="view-reference" class="view-section flex-col w-full max-w-6xl mx-auto pb-20">
+
+      <!-- 5-1. Song select -->
+      <div class="ref-page active" id="ref-page-select">
+        <div class="text-center mb-8 mt-4">
+          <span class="inline-block bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold px-3 py-1 rounded-full mb-3 shadow-sm tracking-wider">REFERENCE</span>
+          <h2 class="text-3xl md:text-4xl font-display-lg font-bold text-on-surface mb-2">레퍼런스 곡을 골라보세요</h2>
+          <p class="text-on-surface-variant text-sm font-medium">이미 분석된 곡을 초급/중급/고급 뷰로 뜯어보거나, 이어카피 퀴즈로 직접 귀 훈련을 해보세요.</p>
+        </div>
+
+        <div class="max-w-xl mx-auto">
+          <div class="section-label" style="font-family:inherit;" >기본 레퍼런스</div>
+          <div class="flex flex-col bg-white/60 border border-white/80 rounded-2xl overflow-hidden shadow-sm mb-6">
+            <button class="preset-btn flex items-center gap-4 p-4 border-b border-white/60 hover:bg-white/60 transition-colors text-left" onclick="refSelectSong('and_july')">
+              <div class="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm">▶</div>
+              <div><div class="font-display-lg font-bold text-on-surface text-[15px]">And July</div><div class="text-xs text-on-surface-variant font-medium">Heize ft. DEAN, DJ Friz</div></div>
+            </button>
+            <button class="preset-btn flex items-center gap-4 p-4 border-b border-white/60 hover:bg-white/60 transition-colors text-left" onclick="refSelectSong('paradise')">
+              <div class="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm">▶</div>
+              <div><div class="font-display-lg font-bold text-on-surface text-[15px]">PARADISE</div><div class="text-xs text-on-surface-variant font-medium">MILLIC ft. FANXY CHILD</div></div>
+            </button>
+            <button class="preset-btn flex items-center gap-4 p-4 hover:bg-white/60 transition-colors text-left" onclick="refSelectSong('feel_my_rhythm')">
+              <div class="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm">▶</div>
+              <div><div class="font-display-lg font-bold text-on-surface text-[15px]">Feel My Rhythm</div><div class="text-xs text-on-surface-variant font-medium">Red Velvet (레드벨벳)</div></div>
+            </button>
+          </div>
+
+          <div id="ref-custom-label" class="section-label hidden items-center justify-between" style="font-family:inherit;">
+            <span>내 레퍼런스 곡</span>
+            <button class="text-[10px] border border-white/80 text-on-surface-variant rounded-full px-2 py-0.5" onclick="refClearCustomSongs()">초기화</button>
+          </div>
+          <div class="flex flex-col bg-white/60 border border-white/80 rounded-2xl overflow-hidden shadow-sm mb-6 hidden" id="ref-dynamic-presets"></div>
+
+          <div class="section-label" style="font-family:inherit;">유튜브 링크로 추가 (자동 구조 추정)</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+            <input id="ref-url-title" type="text" placeholder="곡명" class="glass-input p-3 text-sm">
+            <input id="ref-url-artist" type="text" placeholder="아티스트명" class="glass-input p-3 text-sm">
+          </div>
+          <div class="flex gap-2 mb-1">
+            <input id="ref-url-input" type="text" placeholder="https://youtube.com/watch?v=..." class="glass-input flex-1 p-3 text-sm">
+            <button class="bg-primary text-white font-bold px-5 rounded-xl text-sm shrink-0" onclick="refLoadFromUrl()">추가</button>
+          </div>
+          <p id="ref-url-msg" class="text-xs font-medium mb-6"></p>
+
+          <div class="section-label" style="font-family:inherit;">오디오 파일 업로드 (자동 구조 추정)</div>
+          <div class="border border-dashed border-primary/30 rounded-2xl p-8 text-center cursor-pointer bg-white/40 hover:bg-white/60 transition-colors" id="ref-upload-zone">
+            <div class="text-3xl mb-2">📁</div>
+            <p class="text-sm font-bold text-on-surface">클릭 또는 파일을 드래그</p>
+            <p class="text-xs text-on-surface-variant mt-1">지원: MP3, WAV, M4A (최대 50MB)</p>
+            <input id="ref-file-input" type="file" accept=".mp3,.wav,.m4a,.ogg,.webm" class="hidden">
+          </div>
+          <p id="ref-file-msg" class="text-xs font-medium mt-2"></p>
+          <p class="text-[11px] text-on-surface-variant mt-3 text-center">* 유튜브/파일 자동 분석은 실제 AI 호출 없이 일반적인 곡 구조 패턴으로 추정한 초안이에요 — 참고용으로만 사용하세요.</p>
+        </div>
+      </div>
+
+      <!-- 5-2. Version select -->
+      <div class="ref-page" id="ref-page-version">
+        <div class="text-center mb-8 mt-4">
+          <div class="eyebrow text-primary font-bold text-xs uppercase tracking-widest mb-2" id="ref-version-eyebrow">REFERENCE</div>
+          <h2 class="text-2xl md:text-3xl font-display-lg font-bold text-on-surface mb-1" id="ref-version-title">And July</h2>
+          <p class="text-on-surface-variant text-sm font-medium" id="ref-version-artist">Heize ft. DEAN, DJ Friz</p>
+        </div>
+        <div class="max-w-2xl mx-auto">
+          <p class="text-center text-on-surface-variant text-sm font-medium mb-6">어떤 모드로 학습하고 싶으세요?</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+            <div class="bg-white/60 border border-white/80 rounded-2xl p-7 text-center shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer" onclick="refSelectVersion('fullscore')">
+              <h3 class="font-display-lg font-bold text-lg text-primary mb-2">A ver. 풀스코어</h3>
+              <p class="text-[13px] text-on-surface-variant leading-relaxed">이미 분석된 레이어 맵을 보는 모드. 초급 → 고급으로 디테일을 조절할 수 있어요.</p>
+            </div>
+            <div class="bg-white/60 border border-white/80 rounded-2xl p-7 text-center shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer" onclick="refSelectVersion('earcopy')">
+              <h3 class="font-display-lg font-bold text-lg text-secondary mb-2">B ver. 이어카피</h3>
+              <p class="text-[13px] text-on-surface-variant leading-relaxed">직접 곡을 들으면서 레이어의 코드를 맞혀보는 모드.</p>
+            </div>
+          </div>
+          <button class="w-full bg-white/50 border border-white/80 text-primary font-bold py-3 rounded-xl hover:bg-white/80 transition-all" onclick="refShowStage('select')">← 다른 곡 고르기</button>
+        </div>
+      </div>
+
+      <!-- 5-3. Player -->
+      <div class="ref-page" id="ref-page-player">
+        <button class="back-btn inline-flex items-center gap-2 bg-white/50 border border-white/80 text-primary font-bold text-xs px-4 py-2 rounded-xl mb-5" onclick="refShowStage('version')">← 모드 다시 고르기</button>
+
+        <div class="flex justify-between items-start flex-wrap gap-4 mb-5">
+          <div>
+            <div class="eyebrow text-primary font-bold text-xs uppercase tracking-widest mb-1">REFERENCE</div>
+            <h1 class="text-2xl md:text-3xl font-display-lg font-bold text-on-surface" id="ref-song-title">And July</h1>
+            <div class="text-on-surface-variant text-sm font-medium" id="ref-song-artist">Heize ft. DEAN, DJ Friz</div>
+          </div>
+          <div class="flex gap-1.5 bg-white/50 border border-white/80 rounded-xl p-1">
+            <button class="px-4 py-2 rounded-lg text-xs font-bold transition-all" id="ref-btn-fullscore" onclick="refSwitchVersion('fullscore')">풀스코어</button>
+            <button class="px-4 py-2 rounded-lg text-xs font-bold transition-all" id="ref-btn-earcopy" onclick="refSwitchVersion('earcopy')">이어카피</button>
+          </div>
+        </div>
+
+        <div id="ref-yt-container" class="w-full aspect-video rounded-xl overflow-hidden bg-black shadow-lg mb-5 max-w-3xl mx-auto" style="display:none;">
+          <div id="ref-yt-iframe" class="w-full h-full"></div>
+          <audio id="ref-local-audio" class="w-full hidden" controls></audio>
+        </div>
+
+        <div class="flex items-center gap-4 bg-white/60 border border-white/80 rounded-2xl px-5 py-4 max-w-xl mx-auto mb-2 shadow-sm">
+          <button class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shrink-0" id="ref-play-btn" disabled>
+            <svg width="12" height="14" viewBox="0 0 14 16" fill="currentColor"><path d="M2 1.5l11 6.5-11 6.5V1.5z"/></svg>
+          </button>
+          <div class="text-xs font-mono text-on-surface-variant w-9" id="ref-time">0:00</div>
+          <div class="flex-1 h-2 bg-black/10 rounded-full overflow-hidden cursor-pointer relative" id="ref-progress-outer">
+            <div class="h-full bg-primary rounded-full" id="ref-progress-inner" style="width:0%"></div>
+          </div>
+          <div class="text-xs font-mono text-on-surface-variant w-9 text-right" id="ref-time-end">0:00</div>
+        </div>
+        <div class="text-center mb-6">
+          <span class="inline-block bg-primary/10 border border-primary/20 text-primary text-[11px] font-mono font-bold px-3 py-1 rounded-full" id="ref-section-tag">곡을 재생하면 섹션이 표시돼요</span>
+        </div>
+
+        <!-- Fullscore -->
+        <div id="ref-fullscore-content" class="ref-mode-panel active">
+          <div class="flex gap-1.5 bg-white/50 border border-white/80 rounded-xl p-1 w-fit mb-5" id="ref-mode-tabs">
+            <button class="ref-mode-tab px-4 py-2 rounded-lg text-xs font-bold transition-all active" data-mode="basic">초급</button>
+            <button class="ref-mode-tab px-4 py-2 rounded-lg text-xs font-bold transition-all" data-mode="inter">중급</button>
+            <button class="ref-mode-tab px-4 py-2 rounded-lg text-xs font-bold transition-all" data-mode="adv">고급</button>
+          </div>
+
+          <div class="flex flex-wrap gap-4 mb-5 bg-white/50 border border-white/80 rounded-xl px-4 py-3">
+            <span class="flex items-center gap-1.5 text-xs font-bold"><span class="w-2.5 h-2.5 rounded-full" style="background:#4c5a9d"></span>Drums</span>
+            <span class="flex items-center gap-1.5 text-xs font-bold"><span class="w-2.5 h-2.5 rounded-full" style="background:#954456"></span>Bass</span>
+            <span class="flex items-center gap-1.5 text-xs font-bold"><span class="w-2.5 h-2.5 rounded-full" style="background:#d9b550"></span>Chords</span>
+            <span class="flex items-center gap-1.5 text-xs font-bold"><span class="w-2.5 h-2.5 rounded-full" style="background:#c9a600"></span>Vocal</span>
+            <span class="flex items-center gap-1.5 text-xs font-bold"><span class="w-2.5 h-2.5 rounded-full" style="background:#8AAEFF"></span>FX</span>
+          </div>
+
+          <div class="ref-mode-panel active" id="ref-panel-basic">
+            <div class="ref-board">
+              <div class="ref-board-inner">
+                <div class="ref-ruler"><div class="ref-ruler-label">Section</div><div class="ref-ruler-track" id="ref-ruler-basic"></div></div>
+                <div id="ref-rows-basic"></div>
+                <div class="ref-playhead" id="ref-playhead-basic" style="left:0%"></div>
+              </div>
+            </div>
+            <p class="text-xs text-on-surface-variant mt-3">구간 길이는 BPM 기준 보정된 값이에요. <b>섹션 라벨을 클릭</b>하면 그 구간으로 바로 이동해요.</p>
+          </div>
+
+          <div class="ref-mode-panel" id="ref-panel-inter">
+            <div class="ref-board">
+              <div class="ref-board-inner">
+                <div class="ref-ruler"><div class="ref-ruler-label">Section</div><div class="ref-ruler-track" id="ref-ruler-inter"></div></div>
+                <div id="ref-rows-inter"></div>
+                <div class="ref-row"><div class="ref-row-label">Chords<br>(Verse/Chorus)</div><div class="ref-row-track ref-harmony" id="ref-harmony-track"></div></div>
+                <div class="ref-row"><div class="ref-row-label">Freq. Band<br>(Low/Mid/High)</div><div class="ref-row-track" id="ref-freq-track"></div></div>
+                <div class="ref-playhead" id="ref-playhead-inter" style="left:0%"></div>
+              </div>
+            </div>
+            <div class="bg-white/60 border border-white/80 rounded-xl p-4 mt-3 text-xs leading-relaxed" id="ref-inter-note"></div>
+          </div>
+
+          <div class="ref-mode-panel" id="ref-panel-adv">
+            <div class="ref-board">
+              <div class="ref-board-inner">
+                <div class="ref-ruler"><div class="ref-ruler-label">Section</div><div class="ref-ruler-track" id="ref-ruler-adv"></div></div>
+                <div id="ref-rows-adv"></div>
+                <div class="ref-playhead" id="ref-playhead-adv" style="left:0%"></div>
+              </div>
+            </div>
+            <h2 class="font-display-lg font-bold text-base text-on-surface mt-6 mb-3">그루브 디테일 — Verse vs Chorus (1 bar)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white/60 border border-white/80 rounded-2xl p-5">
+                <div class="text-sm font-bold text-on-surface mb-1">Verse — 힣/스윙 패턴</div>
+                <div class="text-[10.5px] font-mono text-primary mb-3">16th grid · swing ~58%</div>
+                <div class="ref-groove-grid" id="ref-groove-verse"></div>
+                <div class="text-xs text-on-surface-variant leading-relaxed">뒷 스윙이 살짝 <b>뒤로 밀려</b> 여유롭게 들려요 — 부드럽고 레이드백한 느낌.</div>
+              </div>
+              <div class="bg-white/60 border border-white/80 rounded-2xl p-5">
+                <div class="text-sm font-bold text-on-surface mb-1">Chorus — 힣/스윙 패턴</div>
+                <div class="text-[10.5px] font-mono text-primary mb-3">16th grid · swing ~52%, velocity ↑</div>
+                <div class="ref-groove-grid" id="ref-groove-chorus"></div>
+                <div class="text-xs text-on-surface-variant leading-relaxed"><b>벨로시티가 전반적으로 높고</b> 스윙은 줄어서 곧고 세게 밀어붙여요.</div>
+              </div>
+            </div>
+            <h2 class="font-display-lg font-bold text-base text-on-surface mt-6 mb-3">믹스 레퍼런스 — 대역별 밸런스</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white/60 border border-white/80 rounded-2xl p-5">
+                <div class="text-sm font-bold text-on-surface mb-3">Verse — 스펙트럼 스냅샷</div>
+                <svg class="w-full h-[100px] block" viewBox="0 0 300 110" id="ref-spec-verse"></svg>
+              </div>
+              <div class="bg-white/60 border border-white/80 rounded-2xl p-5">
+                <div class="text-sm font-bold text-on-surface mb-3">Chorus — 스펙트럼 스냅샷</div>
+                <svg class="w-full h-[100px] block" viewBox="0 0 300 110" id="ref-spec-chorus"></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Earcopy -->
+        <div id="ref-earcopy-content" style="display:none;">
+          <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm mb-5">
+            <h2 class="font-display-lg font-bold text-lg text-on-surface mb-2">1. 박자 감각 — 탭 템포</h2>
+            <p class="text-[13px] text-on-surface-variant mb-4 leading-relaxed">곡을 들으면서 킥이 찍히는 박에 맞춰 버튼을 4번 이상 눌러보세요.</p>
+            <div class="flex items-center justify-between bg-black/5 rounded-xl px-5 py-4 mb-4">
+              <div><span class="block text-[11px] text-on-surface-variant mb-1">내가 탭한 BPM</span><span class="font-mono text-3xl text-primary" id="ref-tap-bpm">–</span></div>
+              <div class="font-mono text-sm font-bold" id="ref-tap-diff"></div>
+            </div>
+            <button class="w-full bg-primary text-white font-bold py-4 rounded-xl" id="ref-tap-btn">탭 (스페이스바도 가능)</button>
+            <button class="w-full mt-2 border border-white/80 text-on-surface-variant font-bold py-2 rounded-xl text-xs" id="ref-reset-tap">초기화</button>
+          </div>
+
+          <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm mb-5" id="ref-quiz-card">
+            <h2 class="font-display-lg font-bold text-lg text-on-surface mb-2">2-3. 근음 찾기 · 코드 맞히기</h2>
+            <div class="text-xs font-mono text-primary font-bold mb-2" id="ref-quiz-progress">코드 1 / 6</div>
+            <div class="text-xs font-mono text-secondary mb-1" id="ref-chord-time"></div>
+            <div class="text-sm font-bold text-on-surface mb-4" id="ref-chord-section"></div>
+
+            <div id="ref-root-stage">
+              <p class="text-[13px] text-on-surface-variant mb-3">이 구간의 <b class="text-on-surface">근음(root)</b>을 골라보세요.</p>
+              <div class="grid grid-cols-6 gap-2 mb-2" id="ref-note-grid"></div>
+            </div>
+            <div id="ref-quality-stage" style="display:none;">
+              <p class="text-[13px] text-on-surface-variant mt-4 mb-3">이제 코드의 <b class="text-on-surface">종류</b>를 골라보세요.</p>
+              <div class="grid grid-cols-2 gap-2" id="ref-quality-grid"></div>
+            </div>
+
+            <div class="mt-4 p-4 rounded-xl bg-black/5 text-[13px] leading-relaxed hidden" id="ref-feedback"></div>
+            <button class="w-full mt-4 bg-primary text-white font-bold py-3 rounded-xl hidden" id="ref-next-btn">다음 코드</button>
+          </div>
+
+          <div class="bg-white/60 border border-white/80 rounded-2xl p-6 shadow-sm hidden" id="ref-results-card">
+            <div class="text-center py-6">
+              <div class="font-display-lg font-bold text-5xl text-primary mb-2" id="ref-final-score">0/12</div>
+              <div class="text-xs text-on-surface-variant">근음 + 코드 종류 합산 정답 수</div>
+            </div>
+            <table class="w-full text-[13px]">
+              <thead><tr class="text-left text-[10.5px] uppercase text-primary font-mono"><th class="pb-2">구간</th><th class="pb-2">정답</th><th class="pb-2">근음</th><th class="pb-2">종류</th></tr></thead>
+              <tbody id="ref-answer-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -828,6 +1111,7 @@ function navigateTo(route) {
 
   if (route === 'library') loadLibrary();
   if (route === 'community') loadCommunity();
+  if (route === 'reference') refInit();
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -1703,6 +1987,631 @@ function resetToHome() {
   greeting.innerHTML = '';
   
   navigateTo('home');
+}
+
+/* ===================== Reference mode (Fullscore 초/중/고급 + Earcopy) ===================== */
+/* 프론트엔드 전용 목업: 백엔드 연동 없이 localStorage에만 저장됩니다. */
+const REF_TRACK_COLORS = { Drums: '#4c5a9d', Bass: '#954456', Chords: '#d9b550', Vocal: '#c9a600', FX: '#8AAEFF' };
+
+const ref_sections_and_july = [
+  {label:'Intro', start:0, end:29}, {label:'Verse 1', start:29, end:48}, {label:'Pre-chorus 1', start:48, end:67},
+  {label:'Chorus 1', start:68, end:87}, {label:'Verse 2', start:88, end:107}, {label:'Pre-chorus 2', start:107, end:126},
+  {label:'Chorus 2', start:127, end:146}, {label:'Bridge', start:147, end:184}, {label:'Chorus 3', start:185, end:205}, {label:'Outro', start:205, end:229},
+];
+const ref_tracks_and_july = [
+  { name:'Drums', segs:[ {s:0,e:29,label:'DJ Friz 스크래치'},{s:29,e:67,label:'하이햇 그루브'},{s:68,e:87,label:'드럼 풀피처'},{s:88,e:126,label:'벌스2 패턴'},{s:127,e:146,label:'드럼 풀피처'},{s:147,e:184,label:'',ghost:true},{s:185,e:205,label:'드럼 복귀'},{s:205,e:229,label:'페이드 아웃'} ]},
+  { name:'Bass', segs:[ {s:29,e:67,label:'서브 베이스'},{s:68,e:87,label:'베이스 유지'},{s:88,e:126,label:'동일 패턴'},{s:127,e:146,label:'베이스 유지'},{s:147,e:184,label:'',ghost:true},{s:185,e:205,label:'베이스 복귀'},{s:205,e:229,label:'페이드'} ]},
+  { name:'Chords', segs:[ {s:0,e:29,label:'Dm7 루프'},{s:29,e:48,label:'Dm7 → Bbmaj7'},{s:48,e:67,label:'A7b13 (긴장)'},{s:68,e:87,label:'Fmaj9 → Bb13'},{s:88,e:107,label:'Dm7 → Bbmaj7'},{s:107,e:126,label:'A7b13 (긴장)'},{s:127,e:146,label:'Fmaj9 → Bb13'},{s:147,e:184,label:'Dm9 서스테인'},{s:185,e:205,label:'Fmaj9 → Bb13'},{s:205,e:229,label:'Dm7 페이드'} ]},
+  { name:'Vocal', segs:[ {s:29,e:48,label:'Heize 리드'},{s:48,e:67,label:'Heize+백보컬'},{s:68,e:87,label:'Heize 코러스'},{s:88,e:107,label:'DEAN 리드'},{s:107,e:126,label:'DEAN+백보컬'},{s:127,e:146,label:'코러스 반복'},{s:147,e:184,label:'애드립/보컬 레이어'},{s:185,e:205,label:'듀엣'},{s:205,e:229,label:'애드립 페이드'} ]},
+  { name:'FX', segs:[ {s:0,e:29,label:'DJ Friz 스크래치'},{s:205,e:229,label:'스크래치 리콜'} ]},
+];
+const ref_sections_paradise = [
+  {label:'Intro', start:0, end:37}, {label:'Verse 1', start:38, end:71}, {label:'Pre-chorus 1', start:72, end:102},
+  {label:'Chorus 1', start:102, end:134}, {label:'Verse 2a', start:135, end:166}, {label:'Verse 2b', start:166, end:197},
+  {label:'Pre-chorus 2', start:197, end:229}, {label:'Chorus 2', start:229, end:260}, {label:'Outro', start:261, end:302},
+];
+const ref_tracks_paradise = [
+  { name:'Drums', segs:[ {s:0,e:37,label:'로파이 드럼 인트로'},{s:38,e:71,label:'붐뱁 그루브'},{s:72,e:102,label:'빌드업'},{s:102,e:134,label:'코러스 하이햇'},{s:135,e:166,label:'미드템포'},{s:166,e:197,label:'중간 감도'},{s:197,e:229,label:'빌드업'},{s:229,e:260,label:'코러스 하이햇'},{s:261,e:302,label:'페이드아웃',ghost:true} ]},
+  { name:'Bass', segs:[ {s:38,e:71,label:'묵직한 서브베이스'},{s:72,e:102,label:'베이스 유지'},{s:102,e:134,label:'서브+신스 레이어'},{s:135,e:166,label:'스타카토 베이스'},{s:166,e:197,label:'베이스 반복'},{s:197,e:229,label:'베이스 유지'},{s:229,e:260,label:'서브+신스 레이어'},{s:261,e:302,label:'',ghost:true} ]},
+  { name:'Chords', segs:[ {s:0,e:37,label:'Cm9 EP 루프'},{s:38,e:71,label:'Cm9 → Bbmaj7'},{s:72,e:102,label:'Ebmaj9 → Cm9'},{s:102,e:134,label:'Abmaj7 → Cm9'},{s:135,e:166,label:'Cm9 → Bbmaj7'},{s:166,e:197,label:'Cm9 → Bbmaj7'},{s:197,e:229,label:'Ebmaj9 → Cm9'},{s:229,e:260,label:'Abmaj7 → Cm9'},{s:261,e:302,label:'Cm9 페이드'} ]},
+  { name:'Vocal', segs:[ {s:38,e:71,label:'ZICO 벌스'},{s:72,e:102,label:'Crush 프리코러스'},{s:102,e:134,label:'Crush 코러스'},{s:135,e:166,label:'DEAN R&B 벌스'},{s:166,e:197,label:'PENOMECO 벌스'},{s:197,e:229,label:'프리코러스 재반복'},{s:229,e:260,label:'코러스 재반복'},{s:261,e:302,label:'전체 페이드/애드립'} ]},
+  { name:'FX', segs:[ {s:0,e:37,label:'LP 노이즈/보컬 샘플'},{s:72,e:102,label:'라이저 FX'},{s:197,e:229,label:'라이저 FX'},{s:261,e:302,label:'리버브 테일'} ]},
+];
+const ref_sections_fmr = [
+  {label:'Intro', start:0, end:37}, {label:'Verse 1', start:38, end:61}, {label:'Pre-chorus 1', start:62, end:73},
+  {label:'Chorus 1', start:74, end:99}, {label:'Verse 2', start:100, end:104}, {label:'Rap Verse', start:105, end:117},
+  {label:'Verse 2b', start:118, end:123}, {label:'Pre-chorus 2', start:124, end:135}, {label:'Chorus 2', start:135, end:160},
+  {label:'Bridge', start:161, end:192}, {label:'Chorus 3', start:193, end:218},
+];
+const ref_tracks_fmr = [
+  { name:'Drums', segs:[ {s:0,e:37,label:'',ghost:true},{s:38,e:61,label:'가벼운 트랩 비트'},{s:62,e:73,label:'스네어 롤/빌드업'},{s:74,e:99,label:'메인 808 트랩 그루브'},{s:100,e:117,label:'미드믹스/하이햇'},{s:118,e:135,label:'빌드업'},{s:135,e:160,label:'메인 그루브'},{s:161,e:192,label:'',ghost:true},{s:193,e:218,label:'풀 텍스처 비트'} ]},
+  { name:'Bass', segs:[ {s:38,e:61,label:'스타카토 808 베이스'},{s:62,e:73,label:'베이스 다운'},{s:74,e:99,label:'묵직한 808 글라이드'},{s:100,e:117,label:'서브 베이스'},{s:118,e:160,label:'808 글라이드'},{s:161,e:192,label:'코드라인 베이스/첼로'},{s:193,e:218,label:'풀 베이스'} ]},
+  { name:'Chords', segs:[ {s:0,e:37,label:'D장조 오프닝'},{s:38,e:73,label:'D → A/C# → Bm → D/A'},{s:74,e:99,label:'G → D/F# → Em → A'},{s:100,e:135,label:'벌스-코러스 진행 반복'},{s:135,e:160,label:'G → D/F# → Em → A'},{s:161,e:192,label:'Bb → C → D (브릿지 전조)'},{s:193,e:218,label:'메인 스트링+코러스 진행'} ]},
+  { name:'Vocal', segs:[ {s:0,e:37,label:'슬기, 세라, 조이'},{s:38,e:61,label:'아이린, 세라, 슬기, 조이'},{s:62,e:73,label:'조이, 슬기, 아이린'},{s:74,e:99,label:'전원'},{s:100,e:104,label:'조이'},{s:105,e:117,label:'아이린, 슬기(랩)'},{s:118,e:123,label:'세라'},{s:124,e:135,label:'슬기, 세라, 조이'},{s:135,e:160,label:'전원'},{s:161,e:192,label:'슬기, 세라, 조이, 아이린'},{s:193,e:218,label:'전원'} ]},
+  { name:'FX', segs:[ {s:0,e:37,label:'시계소리/필터링 노이즈'},{s:62,e:73,label:'라이저'},{s:105,e:117,label:'보컬 초핑/글리치'},{s:161,e:192,label:'오케스트라 스웰'} ]},
+];
+
+const REF_SONGS_DB = {
+  and_july: { TOTAL: 229, sections: ref_sections_and_july, tracks: ref_tracks_and_july },
+  paradise: { TOTAL: 302, sections: ref_sections_paradise, tracks: ref_tracks_paradise },
+  feel_my_rhythm: { TOTAL: 218, sections: ref_sections_fmr, tracks: ref_tracks_fmr },
+};
+
+const REF_HARMONY = {
+  and_july: {
+    top: [ {s:0,e:29,label:'Dm7 루프'},{s:29,e:67,label:'Dm7 → Bbmaj7'},{s:88,e:126,label:'Dm7 → Bbmaj7'},{s:147,e:184,label:'Dm9 서스테인'} ],
+    bottom: [ {s:68,e:87,label:'Fmaj9 → Bb13'},{s:127,e:146,label:'Fmaj9 → Bb13'},{s:185,e:205,label:'Fmaj9 → Bb13'} ],
+    freq: { 'Intro':[0.15,0.1,0.55],'Verse 1':[0.6,0.65,0.4],'Pre-chorus 1':[0.65,0.75,0.5],'Chorus 1':[0.85,0.8,0.7],'Verse 2':[0.6,0.65,0.4],'Pre-chorus 2':[0.65,0.75,0.5],'Chorus 2':[0.85,0.8,0.7],'Bridge':[0.1,0.5,0.25],'Chorus 3':[0.85,0.8,0.7],'Outro':[0.2,0.3,0.4] },
+    noteText: '벌스~프리코러스~코러스 구조가 2회 반복된 뒤 브릿지로 넘어가는 구조예요. 브릿지(2:27~3:04)에서 베이스/드럼이 빠지며 Dm9 서스테인만 남아요.',
+  },
+  paradise: {
+    top: [ {s:0,e:37,label:'Cm9 EP 루프'},{s:38,e:134,label:'Cm9 → Bbmaj7'},{s:166,e:260,label:'Cm9 → Bbmaj7'} ],
+    bottom: [ {s:102,e:134,label:'Abmaj7 → Cm9 (코러스)'},{s:229,e:260,label:'Abmaj7 → Cm9 (코러스)'} ],
+    freq: { 'Intro':[0.15,0.1,0.5],'Verse 1':[0.65,0.6,0.4],'Pre-chorus 1':[0.6,0.75,0.5],'Chorus 1':[0.85,0.75,0.6],'Verse 2a':[0.5,0.65,0.35],'Verse 2b':[0.6,0.7,0.45],'Pre-chorus 2':[0.6,0.75,0.5],'Chorus 2':[0.85,0.75,0.6],'Outro':[0.2,0.3,0.4] },
+    noteText: 'Cm9 루프가 전 곡을 관통해요. 코러스(Abmaj7 추가)에서 공간이 열리는 구조. DEAN 파트는 미드템포, PENOMECO 파트는 에너지가 저층됩니다.',
+  },
+  feel_my_rhythm: {
+    top: [ {s:0,e:37,label:'G의 삼음 자리(D major)'},{s:38,e:73,label:'D → A/C# → Bm → D/A'},{s:161,e:192,label:'Bb → C → D (브릿지)'} ],
+    bottom: [ {s:74,e:99,label:'G → D/F# → Em → A'},{s:135,e:160,label:'G → D/F# → Em → A'},{s:193,e:218,label:'코러스 톤스탬프'} ],
+    freq: { 'Intro':[0.1,0.6,0.8],'Verse 1':[0.5,0.6,0.6],'Pre-chorus 1':[0.4,0.7,0.7],'Chorus 1':[0.85,0.8,0.9],'Verse 2':[0.5,0.5,0.6],'Rap Verse':[0.75,0.5,0.65],'Verse 2b':[0.5,0.6,0.6],'Pre-chorus 2':[0.4,0.7,0.7],'Chorus 2':[0.85,0.8,0.9],'Bridge':[0.3,0.9,0.8],'Chorus 3':[0.9,0.85,0.9] },
+    noteText: '인트로(0:00~0:37)는 드럼 없이 G의 삼음 자리만 흘러요. 브릿지에서 베이스/드럼이 빠지며 보컬 4명이 극대화됩니다.',
+  },
+};
+
+const REF_BPM = { and_july: 99, paradise: 88, feel_my_rhythm: 158 };
+const REF_QUIZ = {
+  and_july: [
+    {time:'0:00~0:29', section:'Intro', chordName:'Dm7', root:'D', quality:'min'},
+    {time:'0:29~0:48', section:'Verse 1', chordName:'Bbmaj7', root:'A#', quality:'maj'},
+    {time:'0:48~1:07', section:'Pre-chorus 1', chordName:'A7b13', root:'A', quality:'dom'},
+    {time:'1:08~1:27', section:'Chorus 1', chordName:'Fmaj9', root:'F', quality:'maj'},
+    {time:'1:28~1:47', section:'Verse 2', chordName:'Dm7', root:'D', quality:'min'},
+    {time:'2:27~3:04', section:'Bridge', chordName:'Dm9', root:'D', quality:'min'},
+  ],
+  paradise: [
+    {time:'0:00~0:37', section:'Intro', chordName:'Cm9', root:'C', quality:'min'},
+    {time:'0:38~1:11', section:'Verse 1', chordName:'Bbmaj7', root:'A#', quality:'maj'},
+    {time:'1:12~1:42', section:'Pre-chorus 1', chordName:'Ebmaj9', root:'D#', quality:'maj'},
+    {time:'1:42~2:14', section:'Chorus 1', chordName:'Abmaj7', root:'G#', quality:'maj'},
+    {time:'2:15~2:46', section:'Verse 2a', chordName:'Cm9', root:'C', quality:'min'},
+    {time:'3:49~4:20', section:'Chorus 2', chordName:'Abmaj7', root:'G#', quality:'maj'},
+  ],
+  feel_my_rhythm: [
+    {time:'0:00~0:37', section:'Intro', chordName:'D', root:'D', quality:'maj'},
+    {time:'0:38~1:01', section:'Verse 1', chordName:'D', root:'D', quality:'maj'},
+    {time:'1:02~1:13', section:'Pre-chorus 1', chordName:'A', root:'A', quality:'maj'},
+    {time:'1:14~1:39', section:'Chorus 1', chordName:'G', root:'G', quality:'maj'},
+    {time:'1:58~2:03', section:'Verse 2b', chordName:'Bm', root:'B', quality:'min'},
+    {time:'2:41~3:12', section:'Bridge', chordName:'Bb', root:'A#', quality:'maj'},
+  ],
+};
+
+let refTOTAL = 229, refSections = ref_sections_and_july, refTracks = ref_tracks_and_july;
+let refTracksBasic = refTracks.filter(t => t.name !== 'Chords');
+let refCurrentSong = null, refSelectedVersion = null;
+let refYtPlayer = null, refIsPlaying = false, refAnimFrameId = null;
+let refQuizInitializedForSong = null;
+
+function refFmt(sec){ const m=Math.floor(sec/60), s=Math.floor(sec%60); return m+':'+String(s).padStart(2,'0'); }
+
+function refShowStage(name){
+  document.querySelectorAll('.ref-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('ref-page-' + name).classList.add('active');
+}
+
+/* --- Custom song persistence (localStorage only) --- */
+function refLoadCustomSongs(){
+  const saved = localStorage.getItem('muboxing_ref_custom');
+  const container = document.getElementById('ref-dynamic-presets');
+  const label = document.getElementById('ref-custom-label');
+  container.innerHTML = '';
+  if (!saved) { container.classList.add('hidden'); label.classList.add('hidden'); return; }
+  try {
+    const parsed = JSON.parse(saved);
+    const keys = Object.keys(parsed);
+    if (!keys.length) { container.classList.add('hidden'); label.classList.add('hidden'); return; }
+    keys.forEach(key => {
+      REF_SONGS_DB[key] = parsed[key].data;
+      REF_HARMONY[key] = parsed[key].harmony;
+      const btn = document.createElement('button');
+      btn.className = 'preset-btn flex items-center gap-4 p-4 border-b border-white/60 last:border-b-0 hover:bg-white/60 transition-colors text-left';
+      btn.onclick = () => { refCurrentSong = parsed[key].meta; refOpenSong(key); };
+      btn.innerHTML = `<div class="w-9 h-9 rounded-full bg-secondary/15 text-secondary flex items-center justify-center text-xs font-bold">AI</div><div><div class="font-display-lg font-bold text-on-surface text-[15px]">${parsed[key].meta.title}</div><div class="text-xs text-on-surface-variant font-medium">${parsed[key].meta.artist}</div></div>`;
+      container.appendChild(btn);
+    });
+    container.classList.remove('hidden'); container.classList.add('flex', 'flex-col');
+    label.classList.remove('hidden'); label.classList.add('flex');
+  } catch (e) { console.error('레퍼런스 커스텀 곡 로드 실패', e); }
+}
+
+function refClearCustomSongs(){
+  localStorage.removeItem('muboxing_ref_custom');
+  refLoadCustomSongs();
+}
+
+function refSaveCustomSong(id, data, harmony, meta){
+  REF_SONGS_DB[id] = data; REF_HARMONY[id] = harmony;
+  const storageMeta = { ...meta, fileUrl: null };
+  let saved = localStorage.getItem('muboxing_ref_custom');
+  let parsed = saved ? JSON.parse(saved) : {};
+  parsed[id] = { data, harmony, meta: storageMeta };
+  localStorage.setItem('muboxing_ref_custom', JSON.stringify(parsed));
+  refLoadCustomSongs();
+}
+
+/* --- Auto structure heuristic (no AI call, mock estimate) --- */
+function refGenerateAutoAnalysis(N){
+  const blocks = [
+    {label:'Intro', d:16},{label:'Verse 1', d:32},{label:'Pre-chorus', d:16},
+    {label:'Chorus 1', d:32},{label:'Verse 2', d:32},{label:'Chorus 2', d:32},
+    {label:'Bridge', d:16},{label:'Outro', d:32},
+  ];
+  let current = 0; const secs = [];
+  for (const b of blocks){
+    if (current >= N - 5) break;
+    let end = current + b.d;
+    if (end > N - 10) end = N;
+    secs.push({ label:b.label, start:current, end });
+    current = end;
+  }
+  if (current < N && secs.length) secs[secs.length - 1].end = N;
+
+  const tracks = [ {name:'Drums',segs:[]}, {name:'Bass',segs:[]}, {name:'Chords',segs:[]}, {name:'Vocal',segs:[]}, {name:'FX',segs:[]} ];
+  const freqMap = {}; const topHarm = [], bottomHarm = [];
+  secs.forEach(s => {
+    if (s.label === 'Bridge') tracks[0].segs.push({s:s.start,e:s.end,label:'비트 드롭',ghost:true});
+    else tracks[0].segs.push({s:s.start,e:s.end,label:'기본 드럼 루프'});
+    if (s.label !== 'Intro') tracks[1].segs.push({s:s.start,e:s.end,label:'베이스 라인'});
+    tracks[2].segs.push({s:s.start,e:s.end,label:'코드 진행'});
+    if (!['Intro','Outro'].includes(s.label)) tracks[3].segs.push({s:s.start,e:s.end,label:'보컬 구간'});
+    if (['Intro','Bridge','Outro'].includes(s.label)) tracks[4].segs.push({s:s.start,e:s.end,label:'공간감 FX'});
+    freqMap[s.label] = s.label.includes('Chorus') ? [0.8,0.8,0.7] : (s.label === 'Bridge' ? [0.2,0.6,0.4] : [0.5,0.6,0.4]);
+    topHarm.push({s:s.start,e:s.end,label:'벌스 진행 추정'});
+    if (s.label.includes('Chorus')) bottomHarm.push({s:s.start,e:s.end,label:'코러스 변화 감지'});
+  });
+  return {
+    data: { TOTAL:N, sections:secs, tracks },
+    harmony: { top:topHarm, bottom:bottomHarm, freq:freqMap, noteText:'일반적인 곡 구조 패턴을 기반으로 한 추정 구조예요. 실제 AI 분석이 아니라 참고용 초안입니다.' },
+  };
+}
+
+function refExtractVideoId(input){
+  if (!input) return null;
+  const patterns = [/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/, /^([a-zA-Z0-9_-]{11})$/];
+  for (const p of patterns){ const m = input.match(p); if (m) return m[1]; }
+  return null;
+}
+
+function refLoadFromUrl(){
+  const input = document.getElementById('ref-url-input').value.trim();
+  const videoId = refExtractVideoId(input);
+  const msg = document.getElementById('ref-url-msg');
+  if (!videoId){ msg.textContent = '유튜브 링크나 videoId가 올바르지 않아요.'; msg.className = 'text-xs font-medium mb-6 text-kitsch-red'; return; }
+  const title = document.getElementById('ref-url-title').value.trim() || '제목 미상';
+  const artist = document.getElementById('ref-url-artist').value.trim() || '아티스트 미상';
+  const N = 210;
+  const tempId = 'ref_custom_' + Date.now();
+  const analysis = refGenerateAutoAnalysis(N);
+  const meta = { id:tempId, title, artist, youtubeId:videoId, duration:refFmt(N), TOTAL:N };
+  refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta);
+  msg.textContent = '✓ 구조 추정 완료! 목록에서 바로 열립니다.';
+  msg.className = 'text-xs font-medium mb-6 text-primary';
+  refCurrentSong = meta;
+  setTimeout(() => refOpenSong(tempId), 600);
+}
+
+document.getElementById('ref-upload-zone').addEventListener('click', () => document.getElementById('ref-file-input').click());
+document.getElementById('ref-upload-zone').addEventListener('dragover', e => { e.preventDefault(); });
+document.getElementById('ref-upload-zone').addEventListener('drop', e => { e.preventDefault(); refHandleFile(e.dataTransfer.files[0]); });
+document.getElementById('ref-file-input').addEventListener('change', e => refHandleFile(e.target.files[0]));
+
+function refHandleFile(file){
+  const msg = document.getElementById('ref-file-msg');
+  if (!file) return;
+  if (file.size > 50 * 1024 * 1024){ msg.textContent = '파일이 50MB를 초과해요.'; msg.className = 'text-xs font-medium mt-2 text-kitsch-red'; return; }
+  const name = file.name.replace(/\.[^.]+$/, '');
+  const url = URL.createObjectURL(file);
+  msg.textContent = '파일 길이를 확인하는 중...';
+  msg.className = 'text-xs font-medium mt-2 text-on-surface-variant';
+  const audio = new Audio(url);
+  audio.onloadedmetadata = () => {
+    const N = Math.floor(audio.duration);
+    const tempId = 'ref_file_' + Date.now();
+    const analysis = refGenerateAutoAnalysis(N);
+    const meta = { id:tempId, title:name, artist:'로컬 오디오 (자동 추정)', fileUrl:url, youtubeId:null, duration:refFmt(N), TOTAL:N };
+    refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta);
+    msg.textContent = '✓ ' + file.name + ' 구조 추정 완료!';
+    msg.className = 'text-xs font-medium mt-2 text-primary';
+    refCurrentSong = meta;
+    setTimeout(() => refOpenSong(tempId), 600);
+  };
+  audio.onerror = () => { msg.textContent = '파일을 읽을 수 없어요.'; msg.className = 'text-xs font-medium mt-2 text-kitsch-red'; };
+}
+
+/* --- Song / version selection --- */
+function refSelectSong(songId){
+  if (songId === 'and_july') refCurrentSong = { id:'and_july', title:'And July', artist:'Heize ft. DEAN, DJ Friz', youtubeId:'rCeM57e2BfU', duration:'3:49' };
+  else if (songId === 'paradise') refCurrentSong = { id:'paradise', title:'PARADISE', artist:'MILLIC ft. FANXY CHILD', youtubeId:'NyVqm1yWKGU', duration:'5:02' };
+  else if (songId === 'feel_my_rhythm') refCurrentSong = { id:'feel_my_rhythm', title:'Feel My Rhythm', artist:'Red Velvet (레드벨벳)', youtubeId:'R9At2ICm4LQ', duration:'3:38' };
+  refOpenSong(songId);
+}
+
+function refOpenSong(songId){
+  document.getElementById('ref-version-title').textContent = refCurrentSong.title;
+  document.getElementById('ref-version-artist').textContent = refCurrentSong.artist;
+  refShowStage('version');
+}
+
+function refSelectVersion(ver){
+  refSelectedVersion = ver;
+  if (refCurrentSong && refCurrentSong.id) refSetSongData(refCurrentSong.id);
+  refLoadPlayerUI();
+  refShowStage('player');
+  refSwitchVersion(ver);
+  refSetupMedia();
+}
+
+function refSetSongData(songId){
+  if (!REF_SONGS_DB[songId]) return;
+  const d = REF_SONGS_DB[songId];
+  refTOTAL = d.TOTAL; refSections = d.sections; refTracks = d.tracks;
+  refTracksBasic = refTracks.filter(t => t.name !== 'Chords');
+  refBuildRuler('ref-ruler-basic'); refBuildRows('ref-rows-basic', refTracksBasic);
+  refBuildRuler('ref-ruler-inter'); refBuildRows('ref-rows-inter', refTracks);
+  refBuildRuler('ref-ruler-adv'); refBuildRows('ref-rows-adv', refTracksBasic);
+  refBuildHarmonyAndFreq(songId);
+}
+
+function refBuildRuler(elId){
+  const el = document.getElementById(elId); if (!el) return; el.innerHTML = '';
+  refSections.forEach(sec => {
+    const m = document.createElement('div'); m.className = 'ref-section-mark';
+    m.style.left = (sec.start / refTOTAL * 100) + '%'; m.style.width = ((sec.end - sec.start) / refTOTAL * 100) + '%';
+    m.innerHTML = sec.label + '<span class="ref-time">' + refFmt(sec.start) + '</span>';
+    m.onclick = () => {
+      if (refCurrentSong.fileUrl) {
+        const audio = document.getElementById('ref-local-audio');
+        audio.currentTime = sec.start; if (audio.paused) audio.play();
+      } else if (refYtPlayer && typeof refYtPlayer.seekTo === 'function') {
+        refYtPlayer.seekTo(sec.start, true); if (!refIsPlaying) refYtPlayer.playVideo();
+      }
+    };
+    el.appendChild(m);
+  });
+}
+
+function refBuildRows(elId, list){
+  const rowsEl = document.getElementById(elId); if (!rowsEl) return; rowsEl.innerHTML = '';
+  list.forEach(t => {
+    const row = document.createElement('div'); row.className = 'ref-row';
+    const label = document.createElement('div'); label.className = 'ref-row-label'; label.textContent = t.name; row.appendChild(label);
+    const trackEl = document.createElement('div'); trackEl.className = 'ref-row-track';
+    t.segs.forEach(seg => {
+      const b = document.createElement('div'); b.className = 'ref-seg' + (seg.ghost ? ' ref-ghost' : '');
+      b.style.left = (seg.s / refTOTAL * 100) + '%'; b.style.width = ((seg.e - seg.s) / refTOTAL * 100) + '%';
+      if (!seg.ghost) b.style.background = REF_TRACK_COLORS[t.name] || '#4c5a9d';
+      b.textContent = seg.label || ''; b.title = (seg.label || '레이아웃') + ' · ' + refFmt(seg.s) + '~' + refFmt(seg.e);
+      trackEl.appendChild(b);
+    });
+    row.appendChild(trackEl); rowsEl.appendChild(row);
+  });
+}
+
+function refBuildHarmonyAndFreq(songId){
+  const data = REF_HARMONY[songId] || { top:[], bottom:[], freq:{}, noteText:'분석 노트가 없어요.' };
+  const T = REF_SONGS_DB[songId] ? REF_SONGS_DB[songId].TOTAL : refTOTAL;
+  const secs = REF_SONGS_DB[songId] ? REF_SONGS_DB[songId].sections : refSections;
+
+  const harmonyTrack = document.getElementById('ref-harmony-track');
+  if (harmonyTrack) {
+    harmonyTrack.innerHTML = '';
+    data.top.forEach(seg => {
+      const b = document.createElement('div'); b.className = 'ref-harm-seg';
+      b.style.left = (seg.s / T * 100) + '%'; b.style.width = ((seg.e - seg.s) / T * 100) + '%';
+      b.style.background = '#d9b550'; b.textContent = seg.label; harmonyTrack.appendChild(b);
+    });
+    data.bottom.forEach(seg => {
+      const b = document.createElement('div'); b.className = 'ref-harm-seg ref-bottom';
+      b.style.left = (seg.s / T * 100) + '%'; b.style.width = ((seg.e - seg.s) / T * 100) + '%';
+      b.style.background = '#b9a4de'; b.textContent = seg.label; harmonyTrack.appendChild(b);
+    });
+  }
+
+  const freqTrack = document.getElementById('ref-freq-track');
+  if (freqTrack) {
+    freqTrack.innerHTML = '';
+    const colorArr = ['#954456', '#d9b550', '#4c5a9d'];
+    secs.forEach(sec => {
+      const vals = data.freq[sec.label] || [0.3, 0.3, 0.3];
+      const wrap = document.createElement('div'); wrap.className = 'ref-freq-cellwrap';
+      wrap.style.left = (sec.start / T * 100) + '%'; wrap.style.width = ((sec.end - sec.start) / T * 100) + '%';
+      vals.forEach((v, i) => {
+        const col = document.createElement('div'); col.className = 'ref-freq-col';
+        const bar = document.createElement('div'); bar.className = 'ref-freq-bar';
+        bar.style.height = (v * 100) + '%'; bar.style.background = colorArr[i];
+        col.appendChild(bar); wrap.appendChild(col);
+      });
+      freqTrack.appendChild(wrap);
+    });
+  }
+  const noteBox = document.getElementById('ref-inter-note');
+  if (noteBox) noteBox.innerHTML = '<b class="text-primary">보는 법 →</b> ' + data.noteText;
+}
+
+function refLoadPlayerUI(){
+  document.getElementById('ref-song-title').textContent = refCurrentSong.title;
+  document.getElementById('ref-song-artist').textContent = refCurrentSong.artist;
+  document.getElementById('ref-time-end').textContent = refCurrentSong.duration || '0:00';
+  document.getElementById('ref-progress-inner').style.width = '0%';
+  document.getElementById('ref-time').textContent = '0:00';
+}
+
+function refSwitchVersion(ver){
+  refSelectedVersion = ver;
+  document.getElementById('ref-btn-fullscore').classList.toggle('bg-primary', ver === 'fullscore');
+  document.getElementById('ref-btn-fullscore').classList.toggle('text-white', ver === 'fullscore');
+  document.getElementById('ref-btn-earcopy').classList.toggle('bg-secondary', ver === 'earcopy');
+  document.getElementById('ref-btn-earcopy').classList.toggle('text-white', ver === 'earcopy');
+  document.getElementById('ref-fullscore-content').style.display = ver === 'fullscore' ? 'block' : 'none';
+  document.getElementById('ref-earcopy-content').style.display = ver === 'earcopy' ? 'block' : 'none';
+
+  const songId = refCurrentSong?.id;
+  if (ver === 'earcopy' && refQuizInitializedForSong !== songId) {
+    refChordIdx = 0; refEarcopyScore = 0; refEarcopyResults.length = 0;
+    document.getElementById('ref-quiz-card').classList.remove('hidden');
+    document.getElementById('ref-results-card').classList.add('hidden');
+    refTapTimes = []; document.getElementById('ref-tap-bpm').textContent = '–'; document.getElementById('ref-tap-diff').textContent = '';
+    refLoadChord();
+    refQuizInitializedForSong = songId;
+  }
+}
+
+document.getElementById('ref-mode-tabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('.ref-mode-tab'); if (!btn) return;
+  document.querySelectorAll('#ref-mode-tabs .ref-mode-tab').forEach(t => { t.classList.remove('active', 'bg-primary', 'text-white'); });
+  btn.classList.add('active', 'bg-primary', 'text-white');
+  ['basic', 'inter', 'adv'].forEach(m => document.getElementById('ref-panel-' + m).classList.remove('active'));
+  document.getElementById('ref-panel-' + btn.dataset.mode).classList.add('active');
+});
+
+/* --- Media playback (YouTube / local file) --- */
+function refSetupMedia(){
+  const container = document.getElementById('ref-yt-container');
+  const localAudio = document.getElementById('ref-local-audio');
+  const playBtn = document.getElementById('ref-play-btn');
+  if (!refCurrentSong || (!refCurrentSong.youtubeId && !refCurrentSong.fileUrl)) { container.style.display = 'none'; return; }
+
+  container.style.display = 'block';
+  playBtn.disabled = true;
+
+  if (refCurrentSong.fileUrl) {
+    if (refYtPlayer && refYtPlayer.destroy) refYtPlayer.destroy();
+    document.getElementById('ref-yt-iframe').style.display = 'none';
+    localAudio.style.display = 'block';
+    localAudio.src = refCurrentSong.fileUrl;
+    localAudio.onloadedmetadata = () => { playBtn.disabled = false; document.getElementById('ref-time-end').textContent = refFmt(localAudio.duration); };
+    localAudio.onplay = () => { refIsPlaying = true; cancelAnimationFrame(refAnimFrameId); refUpdatePlayerLoop(); };
+    localAudio.onpause = () => { refIsPlaying = false; cancelAnimationFrame(refAnimFrameId); };
+    return;
+  }
+
+  localAudio.style.display = 'none';
+  if (refYtPlayer && refYtPlayer.destroy) { refYtPlayer.destroy(); refYtPlayer = null; }
+  document.getElementById('ref-yt-iframe').outerHTML = '<div id="ref-yt-iframe" class="w-full h-full"></div>';
+
+  function trySetup(){
+    if (window.YT && window.YT.Player) {
+      refYtPlayer = new YT.Player('ref-yt-iframe', {
+        height: '360', width: '100%', videoId: refCurrentSong.youtubeId,
+        playerVars: { playsinline: 1, controls: 1, rel: 0, modestbranding: 1 },
+        events: {
+          onReady: () => { playBtn.disabled = false; const dur = refYtPlayer.getDuration(); if (dur > 0) document.getElementById('ref-time-end').textContent = refFmt(dur); },
+          onStateChange: (event) => {
+            if (event.data === YT.PlayerState.PLAYING) { refIsPlaying = true; cancelAnimationFrame(refAnimFrameId); refUpdatePlayerLoop(); }
+            else { refIsPlaying = false; cancelAnimationFrame(refAnimFrameId); }
+          }
+        }
+      });
+    } else { setTimeout(trySetup, 300); }
+  }
+  trySetup();
+}
+
+document.getElementById('ref-play-btn').addEventListener('click', () => {
+  if (refCurrentSong && refCurrentSong.fileUrl) {
+    const audio = document.getElementById('ref-local-audio');
+    if (audio.paused) audio.play(); else audio.pause();
+    return;
+  }
+  if (!refYtPlayer || typeof refYtPlayer.getPlayerState !== 'function') return;
+  if (refYtPlayer.getPlayerState() === YT.PlayerState.PLAYING) refYtPlayer.pauseVideo(); else refYtPlayer.playVideo();
+});
+
+function refUpdatePlayerLoop(){
+  if (!refIsPlaying) return;
+  let currentTime = 0, duration = refTOTAL;
+  if (refCurrentSong.fileUrl) {
+    const audio = document.getElementById('ref-local-audio');
+    currentTime = audio.currentTime; duration = audio.duration || refTOTAL;
+  } else if (refYtPlayer && typeof refYtPlayer.getCurrentTime === 'function') {
+    currentTime = refYtPlayer.getCurrentTime(); duration = refYtPlayer.getDuration() || refTOTAL;
+  }
+  const uiPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const scorePercent = refTOTAL > 0 ? (currentTime / refTOTAL) * 100 : 0;
+  document.getElementById('ref-time').textContent = refFmt(currentTime);
+  document.getElementById('ref-progress-inner').style.width = Math.min(uiPercent, 100) + '%';
+  ['basic', 'inter', 'adv'].forEach(m => { const ph = document.getElementById('ref-playhead-' + m); if (ph) ph.style.left = Math.min(scorePercent, 100) + '%'; });
+  const currentSec = refSections.find(s => currentTime >= s.start && currentTime < s.end);
+  document.getElementById('ref-section-tag').textContent = currentSec ? currentSec.label : '...';
+  refAnimFrameId = requestAnimationFrame(refUpdatePlayerLoop);
+}
+
+document.getElementById('ref-progress-outer').addEventListener('click', (e) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  let percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  if (refCurrentSong.fileUrl) {
+    const audio = document.getElementById('ref-local-audio');
+    audio.currentTime = percent * (audio.duration || refTOTAL);
+    if (audio.paused) audio.play();
+  } else if (refYtPlayer && typeof refYtPlayer.getDuration === 'function') {
+    refYtPlayer.seekTo(percent * (refYtPlayer.getDuration() || refTOTAL), true);
+    if (!refIsPlaying) refYtPlayer.playVideo();
+  }
+  document.getElementById('ref-progress-inner').style.width = (percent * 100) + '%';
+});
+
+/* --- Groove / spectrum decorative charts (advanced tab) --- */
+function refBuildGroove(elId, pattern){
+  const el = document.getElementById(elId); if (!el) return; el.innerHTML = '';
+  for (let i = 0; i < 16; i++) {
+    const step = document.createElement('div'); step.className = 'ref-step';
+    const hitData = pattern[i];
+    if (hitData) {
+      const hit = document.createElement('div'); hit.className = 'ref-hit';
+      hit.style.height = (hitData.vel * 100) + '%'; hit.style.background = hitData.color;
+      step.appendChild(hit);
+    }
+    const num = document.createElement('div'); num.className = 'ref-step-num'; num.textContent = i + 1;
+    el.appendChild(step); el.appendChild(num);
+  }
+}
+const REF_VERSE_PATTERN = { 0:{color:'#4c5a9d',vel:0.75},2:{color:'#8AAEFF',vel:0.3},4:{color:'#954456',vel:0.7},6:{color:'#8AAEFF',vel:0.25},8:{color:'#4c5a9d',vel:0.55},10:{color:'#8AAEFF',vel:0.3},12:{color:'#954456',vel:0.7},14:{color:'#8AAEFF',vel:0.3} };
+const REF_CHORUS_PATTERN = { 0:{color:'#4c5a9d',vel:0.9},2:{color:'#8AAEFF',vel:0.4},4:{color:'#954456',vel:0.9},6:{color:'#8AAEFF',vel:0.35},8:{color:'#4c5a9d',vel:0.85},9:{color:'#4c5a9d',vel:0.4},10:{color:'#8AAEFF',vel:0.4},12:{color:'#954456',vel:0.95},14:{color:'#8AAEFF',vel:0.4} };
+
+function refBuildSpectrum(svgId, lowCurve, midCurve, highCurve){
+  const svg = document.getElementById(svgId); if (!svg) return;
+  const w = 300, h = 110;
+  function pathFor(vals){
+    const step = w / (vals.length - 1);
+    let d = 'M0,' + (h - vals[0] * h);
+    vals.forEach((v, i) => { if (i > 0) d += ' L' + (i * step) + ',' + (h - v * h); });
+    d += ' L' + w + ',' + h + ' L0,' + h + ' Z';
+    return d;
+  }
+  svg.innerHTML =
+    '<path d="' + pathFor(lowCurve) + '" fill="#954456" opacity="0.55"></path>' +
+    '<path d="' + pathFor(midCurve) + '" fill="#d9b550" opacity="0.55"></path>' +
+    '<path d="' + pathFor(highCurve) + '" fill="#4c5a9d" opacity="0.6"></path>';
+}
+
+function refInitDecorativeCharts(){
+  refBuildGroove('ref-groove-verse', REF_VERSE_PATTERN);
+  refBuildGroove('ref-groove-chorus', REF_CHORUS_PATTERN);
+  refBuildSpectrum('ref-spec-verse', [0.4,0.45,0.5,0.45,0.4,0.4], [0.55,0.65,0.7,0.68,0.6,0.55], [0.35,0.4,0.4,0.38,0.35,0.3]);
+  refBuildSpectrum('ref-spec-chorus', [0.75,0.8,0.85,0.8,0.78,0.75], [0.45,0.5,0.55,0.5,0.48,0.45], [0.6,0.65,0.7,0.65,0.6,0.55]);
+}
+
+/* --- BPM tap game --- */
+let refTapTimes = [];
+document.getElementById('ref-tap-btn').addEventListener('click', refRegisterTap);
+document.getElementById('ref-reset-tap').addEventListener('click', () => { refTapTimes = []; document.getElementById('ref-tap-bpm').textContent = '–'; document.getElementById('ref-tap-diff').textContent = ''; });
+document.addEventListener('keydown', (e) => { if (e.code === 'Space' && !e.target.matches('button,input,textarea') && document.getElementById('view-reference').classList.contains('active') && refSelectedVersion === 'earcopy') { e.preventDefault(); refRegisterTap(); } });
+
+function refRegisterTap(){
+  const now = performance.now(); refTapTimes.push(now);
+  if (refTapTimes.length > 8) refTapTimes.shift();
+  if (refTapTimes.length >= 2) {
+    const intervals = [];
+    for (let i = 1; i < refTapTimes.length; i++) intervals.push(refTapTimes[i] - refTapTimes[i - 1]);
+    const avgMs = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+    const bpm = Math.round(60000 / avgMs);
+    document.getElementById('ref-tap-bpm').textContent = bpm;
+    const actual = REF_BPM[refCurrentSong?.id] || 100;
+    const diff = bpm - actual;
+    const diffEl = document.getElementById('ref-tap-diff');
+    diffEl.textContent = diff === 0 ? '정확해요!' : (diff > 0 ? '+' + diff + ' (빠름)' : diff + ' (느림)');
+    diffEl.style.color = Math.abs(diff) <= 3 ? '#059669' : '#767681';
+  }
+}
+
+/* --- Chord ear-training quiz --- */
+const REF_NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const REF_QUALITIES = [ {id:'maj',label:'메이저 (Major/maj7)'}, {id:'min',label:'마이너 (minor/m7)'}, {id:'dom',label:'도미넌트 7th (7/9/13)'}, {id:'dim',label:'디미니시드 / 기타'} ];
+let refChordIdx = 0, refRootAnswer = null, refQualityAnswer = null, refEarcopyScore = 0;
+const refEarcopyResults = [];
+
+function refGetQuizChords(){ return REF_QUIZ[refCurrentSong?.id] || REF_QUIZ.and_july; }
+
+function refLoadChord(){
+  const chords = refGetQuizChords();
+  if (refChordIdx >= chords.length) { refShowFinalResults(); return; }
+  const c = chords[refChordIdx];
+  document.getElementById('ref-quiz-progress').textContent = '코드 ' + (refChordIdx + 1) + ' / ' + chords.length;
+  document.getElementById('ref-chord-time').textContent = c.time;
+  document.getElementById('ref-chord-section').textContent = c.section + ' 구간';
+  refRootAnswer = null; refQualityAnswer = null;
+  document.getElementById('ref-root-stage').style.display = 'block';
+  document.getElementById('ref-quality-stage').style.display = 'none';
+  document.getElementById('ref-feedback').classList.add('hidden');
+  document.getElementById('ref-next-btn').classList.add('hidden');
+
+  const noteGrid = document.getElementById('ref-note-grid'); noteGrid.innerHTML = '';
+  REF_NOTES.forEach(n => { const b = document.createElement('div'); b.className = 'ref-note-btn'; b.textContent = n; b.addEventListener('click', () => refSelectRoot(n, b)); noteGrid.appendChild(b); });
+
+  const qualityGrid = document.getElementById('ref-quality-grid'); qualityGrid.innerHTML = '';
+  REF_QUALITIES.forEach(q => { const b = document.createElement('div'); b.className = 'ref-quality-btn'; b.textContent = q.label; b.dataset.id = q.id; b.addEventListener('click', () => refSelectQuality(q.id, b)); qualityGrid.appendChild(b); });
+}
+
+function refSelectRoot(note, btnEl){
+  if (refRootAnswer !== null) return;
+  refRootAnswer = note;
+  const c = refGetQuizChords()[refChordIdx];
+  const map = { 'Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#' };
+  const correct = (map[note] || note) === (map[c.root] || c.root);
+  [...document.getElementById('ref-note-grid').children].forEach(b => {
+    if ((map[b.textContent] || b.textContent) === (map[c.root] || c.root)) b.classList.add('ref-correct');
+    else if (b === btnEl && !correct) b.classList.add('ref-wrong');
+  });
+  if (correct) refEarcopyScore++;
+  setTimeout(() => { document.getElementById('ref-quality-stage').style.display = 'block'; }, 400);
+}
+
+function refSelectQuality(qid, btnEl){
+  if (refQualityAnswer !== null) return;
+  refQualityAnswer = qid;
+  const c = refGetQuizChords()[refChordIdx];
+  const correct = qid === c.quality;
+  [...document.getElementById('ref-quality-grid').children].forEach(b => {
+    if (b.dataset.id === c.quality) b.classList.add('ref-correct');
+    else if (b === btnEl && !correct) b.classList.add('ref-wrong');
+  });
+  if (correct) refEarcopyScore++;
+  refEarcopyResults.push({ section: c.section, chordName: c.chordName, rootOk: refRootAnswer === c.root, qualOk: correct });
+  const fb = document.getElementById('ref-feedback');
+  fb.innerHTML = '정답은 <b>' + c.chordName + '</b>였어요 (근음 ' + c.root + ' · ' + REF_QUALITIES.find(q => q.id === c.quality).label + ')';
+  fb.classList.remove('hidden'); document.getElementById('ref-next-btn').classList.remove('hidden');
+}
+document.getElementById('ref-next-btn').addEventListener('click', () => { refChordIdx++; refLoadChord(); });
+
+function refShowFinalResults(){
+  document.getElementById('ref-quiz-card').classList.add('hidden');
+  document.getElementById('ref-results-card').classList.remove('hidden');
+  document.getElementById('ref-final-score').textContent = refEarcopyScore + '/' + (refGetQuizChords().length * 2);
+  const tbody = document.getElementById('ref-answer-table'); tbody.innerHTML = '';
+  refEarcopyResults.forEach(r => {
+    const tr = document.createElement('tr'); tr.className = 'border-t border-black/5';
+    tr.innerHTML = '<td class="py-2">' + r.section + '</td><td class="py-2">' + r.chordName + '</td>' +
+      '<td class="py-2 ' + (r.rootOk ? 'text-primary font-bold' : 'text-kitsch-red') + '">' + (r.rootOk ? '맞음' : '틀림') + '</td>' +
+      '<td class="py-2 ' + (r.qualOk ? 'text-primary font-bold' : 'text-kitsch-red') + '">' + (r.qualOk ? '맞음' : '틀림') + '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function refLoadYouTubeAPI(){
+  if (window.YT && window.YT.Player) return;
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+window.onYouTubeIframeAPIReady = function(){ /* refSetupMedia polls window.YT itself */ };
+
+let refInitialized = false;
+function refInit(){
+  if (refInitialized) return;
+  refInitialized = true;
+  refLoadYouTubeAPI();
+  refLoadCustomSongs();
+  refInitDecorativeCharts();
 }
 
 // Init
