@@ -2414,6 +2414,10 @@ function refLoadPlayerUI(){
   document.getElementById('ref-time-end').textContent = refCurrentSong.duration || '0:00';
   document.getElementById('ref-progress-inner').style.width = '0%';
   document.getElementById('ref-time').textContent = '0:00';
+  // 재생바/헤드/섹션 태그를 항상 Intro(맨 처음) 상태로 리셋 — 이전 곡의 마지막 위치가 남아있지 않도록
+  ['basic', 'inter', 'adv'].forEach(m => { const ph = document.getElementById('ref-playhead-' + m); if (ph) ph.style.left = '0%'; });
+  const introLabel = (refSections && refSections[0]) ? refSections[0].label : '곡을 재생하면 섹션이 표시돼요';
+  document.getElementById('ref-section-tag').textContent = introLabel;
 }
 
 function refSwitchVersion(ver){
@@ -2473,7 +2477,7 @@ function refSetupMedia(){
     if (window.YT && window.YT.Player) {
       refYtPlayer = new YT.Player('ref-yt-iframe', {
         height: '360', width: '100%', videoId: refCurrentSong.youtubeId,
-        playerVars: { playsinline: 1, controls: 1, rel: 0, modestbranding: 1 },
+        playerVars: { playsinline: 1, controls: 1, rel: 0, modestbranding: 1, start: 0 },
         events: {
           onReady: () => { playBtn.disabled = false; const dur = refYtPlayer.getDuration(); if (dur > 0) document.getElementById('ref-time-end').textContent = refFmt(dur); },
           onStateChange: (event) => {
