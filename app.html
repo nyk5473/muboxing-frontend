@@ -2220,7 +2220,7 @@ function refExtractVideoId(input){
   return null;
 }
 
-function refLoadFromUrl(){
+async function refLoadFromUrl(){
   const input = document.getElementById('ref-url-input').value.trim();
   const videoId = refExtractVideoId(input);
   const msg = document.getElementById('ref-url-msg');
@@ -2229,11 +2229,27 @@ function refLoadFromUrl(){
   const artist = document.getElementById('ref-url-artist').value.trim() || '아티스트 미상';
   const N = 210;
   const tempId = 'ref_custom_' + Date.now();
-  const analysis = refGenerateAutoAnalysis(N);
   const meta = { id:tempId, title, artist, youtubeId:videoId, duration:refFmt(N), TOTAL:N };
-  refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta);
-  msg.textContent = '✓ 구조 추정 완료! 목록에서 바로 열립니다.';
+
+  msg.textContent = '✨ AI가 "' + title + '" 구조를 분석하는 중...';
   msg.className = 'text-xs font-medium mb-6 text-primary';
+
+  let analysis;
+  try {
+    const result = await authFetch('/ai/analyze-reference', {
+      method: 'POST',
+      body: JSON.stringify({ title, artist, composer: '', duration: N }),
+    });
+    analysis = { data: result.data, harmony: result.harmony };
+    msg.textContent = '✓ AI 분석 완료! 목록에서 바로 열립니다.';
+    msg.className = 'text-xs font-medium mb-6 text-primary';
+  } catch (e) {
+    analysis = refGenerateAutoAnalysis(N);
+    msg.textContent = '⚠ AI 분석에 실패해서 일반적인 구조로 대신 채웠어요 (' + e.message + ')';
+    msg.className = 'text-xs font-medium mb-6 text-kitsch-red';
+  }
+
+  refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta);
   refCurrentSong = meta;
   setTimeout(() => refOpenSong(tempId), 600);
 }
