@@ -944,7 +944,7 @@
               <div class="ref-board-inner">
                 <div class="ref-ruler"><div class="ref-ruler-label">Section</div><div class="ref-ruler-track" id="ref-ruler-basic"></div></div>
                 <div id="ref-rows-basic"></div>
-                <div class="ref-playhead" id="ref-playhead-basic" style="left:0%"></div>
+                <div class="ref-playhead" id="ref-playhead-basic" style="left:100px"></div>
               </div>
             </div>
             <p class="text-xs text-on-surface-variant mt-3">구간 길이는 BPM 기준 보정된 값이에요. <b>섹션 라벨을 클릭</b>하면 그 구간으로 바로 이동해요.</p>
@@ -957,7 +957,7 @@
                 <div id="ref-rows-inter"></div>
                 <div class="ref-row"><div class="ref-row-label">Chords<br>(Verse/Chorus)</div><div class="ref-row-track ref-harmony" id="ref-harmony-track"></div></div>
                 <div class="ref-row"><div class="ref-row-label">Freq. Band<br>(Low/Mid/High)</div><div class="ref-row-track" id="ref-freq-track"></div></div>
-                <div class="ref-playhead" id="ref-playhead-inter" style="left:0%"></div>
+                <div class="ref-playhead" id="ref-playhead-inter" style="left:100px"></div>
               </div>
             </div>
             <div class="bg-white/60 border border-white/80 rounded-xl p-4 mt-3 text-xs leading-relaxed" id="ref-inter-note"></div>
@@ -968,7 +968,7 @@
               <div class="ref-board-inner">
                 <div class="ref-ruler"><div class="ref-ruler-label">Section</div><div class="ref-ruler-track" id="ref-ruler-adv"></div></div>
                 <div id="ref-rows-adv"></div>
-                <div class="ref-playhead" id="ref-playhead-adv" style="left:0%"></div>
+                <div class="ref-playhead" id="ref-playhead-adv" style="left:100px"></div>
               </div>
             </div>
             <h2 class="font-display-lg font-bold text-base text-on-surface mt-6 mb-3">그루브 디테일 — Verse vs Chorus (1 bar)</h2>
@@ -2415,7 +2415,7 @@ function refLoadPlayerUI(){
   document.getElementById('ref-progress-inner').style.width = '0%';
   document.getElementById('ref-time').textContent = '0:00';
   // 재생바/헤드/섹션 태그를 항상 Intro(맨 처음) 상태로 리셋 — 이전 곡의 마지막 위치가 남아있지 않도록
-  ['basic', 'inter', 'adv'].forEach(m => { const ph = document.getElementById('ref-playhead-' + m); if (ph) ph.style.left = '0%'; });
+  ['basic', 'inter', 'adv'].forEach(m => { const ph = document.getElementById('ref-playhead-' + m); if (ph) ph.style.left = '100px'; });
   const introLabel = (refSections && refSections[0]) ? refSections[0].label : '곡을 재생하면 섹션이 표시돼요';
   document.getElementById('ref-section-tag').textContent = introLabel;
 }
@@ -2514,7 +2514,10 @@ function refUpdatePlayerLoop(){
   const scorePercent = refTOTAL > 0 ? (currentTime / refTOTAL) * 100 : 0;
   document.getElementById('ref-time').textContent = refFmt(currentTime);
   document.getElementById('ref-progress-inner').style.width = Math.min(uiPercent, 100) + '%';
-  ['basic', 'inter', 'adv'].forEach(m => { const ph = document.getElementById('ref-playhead-' + m); if (ph) ph.style.left = Math.min(scorePercent, 100) + '%'; });
+  // 재생 헤드는 라벨 칸(100px)을 뺀 실제 트랙 영역 기준으로 위치를 잡아야 해요.
+  const scoreFrac = Math.min(scorePercent, 100) / 100;
+  const playheadLeft = 'calc(100px + (100% - 100px) * ' + scoreFrac + ')';
+  ['basic', 'inter', 'adv'].forEach(m => { const ph = document.getElementById('ref-playhead-' + m); if (ph) ph.style.left = playheadLeft; });
   const currentSec = refSections.find(s => currentTime >= s.start && currentTime < s.end);
   document.getElementById('ref-section-tag').textContent = currentSec ? currentSec.label : '...';
   refAnimFrameId = requestAnimationFrame(refUpdatePlayerLoop);
