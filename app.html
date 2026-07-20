@@ -347,7 +347,7 @@
           <p class="text-on-surface-variant font-medium text-lg leading-relaxed mb-10 max-w-lg">Muboxing은 감성(Feeling)부터 비트, 멜로디, 구조, 피드백까지 5단계 프레임워크로 레퍼런스 곡을 언박싱하는 AI 음악 튜터입니다. 정답을 외우지 않고, 스스로 분석하는 감각을 기릅니다.</p>
           <div class="flex gap-4">
             <button class="bg-primary text-white font-bold py-3.5 px-8 rounded-full shadow-md hover:bg-primary/90 transition-all text-base" onclick="navigateTo('analysis')">무료로 언박싱 시작하기 <span class="material-symbols-outlined align-middle text-[18px] ml-1">arrow_forward</span></button>
-            <button class="bg-surface-container/80 border border-white/10 text-primary font-bold py-3.5 px-6 rounded-full shadow-sm hover:bg-surface-container-high transition-all text-base">5단계 프레임워크 보기</button>
+            <button class="bg-surface-container/80 border border-white/10 text-primary font-bold py-3.5 px-6 rounded-full shadow-sm hover:bg-surface-container-high transition-all text-base" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth', block:'start'})">5단계 프레임워크 보기</button>
           </div>
           <div class="flex items-center gap-6 mt-8 text-sm font-medium text-on-surface-variant">
             <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> 가입 없이 체험 가능</span>
@@ -364,7 +364,7 @@
       </section>
 
       <!-- 5 Steps Section -->
-      <section class="scroll-fade flex flex-col items-center text-center mb-32">
+      <section id="how-it-works" class="scroll-fade flex flex-col items-center text-center mb-32" style="scroll-margin-top: 96px;">
         <span class="bg-primary-fixed text-on-primary-fixed-variant font-bold px-4 py-1.5 rounded-full text-xs tracking-widest mb-4 uppercase shadow-sm">How it works</span>
         <h2 class="font-display-lg text-3xl md:text-4xl font-bold text-on-surface mb-4">5단계로 완성하는 언박싱 프레임워크</h2>
         <p class="text-on-surface-variant font-medium text-lg mb-12">순서대로 따라가며 곡의 표면부터 구조, 창작 적용까지 단계적으로 파고듭니다.</p>
@@ -492,7 +492,7 @@
             <div class="bg-surface-container/60 border border-white/10 rounded-2xl p-6 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer" onclick="goToStep('feeling')">
               <div class="w-11 h-11 rounded-xl bg-primary/15 text-primary flex items-center justify-center mb-4"><span class="material-symbols-outlined">route</span></div>
               <h3 class="font-display-lg font-bold text-lg text-on-surface mb-2">프레임워크</h3>
-              <p class="text-[13px] text-on-surface-variant leading-relaxed mb-3">Feeling→Beat→Melody→Structure→Feedback 5단계를 순서대로 밟으며 스스로 관찰하고 기록해요.</p>
+              <p class="text-[13px] text-on-surface-variant leading-relaxed mb-3 break-words">Feeling → Beat → Melody → Structure → Feedback 5단계를 순서대로 밟으며 스스로 관찰하고 기록해요.</p>
               <span class="text-xs font-bold text-primary">직접 분석하며 배우기 →</span>
             </div>
             <div class="bg-surface-container/60 border border-white/10 rounded-2xl p-6 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer" onclick="startReferenceMode('fullscore')">
