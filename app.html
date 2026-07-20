@@ -160,11 +160,20 @@
     #left-sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     body.sidebar-closed #left-sidebar { transform: translateX(-100%); }
     body.sidebar-closed #main-content-wrapper { margin-left: 0 !important; }
-    
+
+    /* 모바일에서는 사이드바가 고정(fixed) 오버레이라서 본문과 겹쳐 보이므로 기본은 닫힘 상태로 둔다 */
+    @media (max-width: 767px) {
+      #left-sidebar { transform: translateX(-100%); }
+      body.sidebar-mobile-open #left-sidebar { transform: translateX(0); }
+      body.sidebar-mobile-open #sidebar-backdrop { display: block; }
+    }
+    #sidebar-backdrop { display: none; position: fixed; inset: 0; top: 72px; background: rgba(0,0,0,0.5); z-index: 39; }
+
     /* Hide Sidebars globally if not in analysis route */
     body:not([data-route="analysis"]) #left-sidebar { display: none !important; }
     body:not([data-route="analysis"]) #right-sidebar { display: none !important; }
     body:not([data-route="analysis"]) #main-content-wrapper { margin-left: 0 !important; }
+    body:not([data-route="analysis"]) #sidebar-backdrop { display: none !important; }
 
     /* ================= Reference (Fullscore / Earcopy) mode ================= */
     .ref-page { display: none; }
@@ -280,7 +289,10 @@
 </div>
 
 <div class="flex pt-[72px] min-h-screen relative z-10 max-w-[1600px] mx-auto overflow-hidden">
-  
+
+  <!-- 모바일에서 사이드바가 열렸을 때 본문과 겹치지 않도록 탭하면 닫히는 어두운 배경 -->
+  <div id="sidebar-backdrop" onclick="document.body.classList.remove('sidebar-mobile-open')"></div>
+
   <!-- Left SideNavBar (Analysis View Only) -->
   <aside id="left-sidebar" class="flex flex-col w-64 shrink-0 bg-surface-container/30 backdrop-blur-xl border-r border-white/10 p-5 fixed md:sticky top-[72px] h-[calc(100vh-72px)] z-40 rounded-r-2xl shadow-sm">
     <div class="mb-8 px-2 mt-2">
@@ -1101,8 +1113,12 @@ function initScrollAnimations() {
 function navigateTo(route) {
   document.body.setAttribute('data-route', route);
   
-  // 사이드바가 열려있을 때 닫기 처리
-  document.body.classList.remove('sidebar-closed');
+  // 데스크톱(사이드에 도킹된 상태)에서만 사이드바를 자동으로 열어준다.
+  // 모바일에서는 fixed 오버레이라 본문과 겹치므로, 라우트 이동 시 항상 닫아둔다.
+  if (window.innerWidth >= 768) {
+    document.body.classList.remove('sidebar-closed');
+  }
+  document.body.classList.remove('sidebar-mobile-open');
 
   document.querySelectorAll('.top-nav-item').forEach(el => {
     if (el.dataset.route === route) {
@@ -1352,7 +1368,11 @@ async function shareToCommunity() {
 
 /* ===================== Sidebar Toggle Logic ===================== */
 document.getElementById('sidebar-toggle').addEventListener('click', () => {
-    document.body.classList.toggle('sidebar-closed');
+    if (window.innerWidth < 768) {
+        document.body.classList.toggle('sidebar-mobile-open');
+    } else {
+        document.body.classList.toggle('sidebar-closed');
+    }
 });
 
 /* ===================== Muboxing — Analysis App State & Logic ===================== */
