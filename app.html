@@ -921,9 +921,6 @@
             <div class="eyebrow text-primary font-bold text-xs uppercase tracking-widest mb-1">REFERENCE</div>
             <h1 class="text-2xl md:text-3xl font-display-lg font-bold text-on-surface" id="ref-song-title">And July</h1>
             <div class="text-on-surface-variant text-sm font-medium" id="ref-song-artist">Heize ft. DEAN, DJ Friz</div>
-            <div id="ref-ai-disclaimer" class="hidden mt-2 inline-flex items-center gap-1.5 bg-accent-yellow/15 border border-accent-yellow/40 text-accent-yellow text-[11px] font-bold px-3 py-1.5 rounded-full">
-              <span class="material-symbols-outlined text-sm">info</span>AI 추정 구조 — 실제 곡과 다를 수 있어요
-            </div>
           </div>
           <div class="flex gap-1.5 bg-surface-container/50 border border-white/10 rounded-xl p-1">
             <button class="px-4 py-2 rounded-lg text-xs font-bold transition-all" id="ref-btn-fullscore" onclick="refSwitchVersion('fullscore')">풀스코어</button>
@@ -2286,7 +2283,7 @@ async function refLoadFromUrl(){
   const artist = document.getElementById('ref-url-artist').value.trim() || '아티스트 미상';
   const N = 210;
   const tempId = 'ref_custom_' + Date.now();
-  const meta = { id:tempId, title, artist, youtubeId:videoId, duration:refFmt(N), TOTAL:N, aiEstimated:true };
+  const meta = { id:tempId, title, artist, youtubeId:videoId, duration:refFmt(N), TOTAL:N };
 
   msg.textContent = '✨ AI가 "' + title + '" 구조를 분석하는 중...';
   msg.className = 'text-xs font-medium mb-6 text-primary';
@@ -2329,7 +2326,7 @@ function refHandleFile(file){
     const N = Math.floor(audio.duration);
     const tempId = 'ref_file_' + Date.now();
     const analysis = refGenerateAutoAnalysis(N);
-    const meta = { id:tempId, title:name, artist:'로컬 오디오 (자동 추정)', fileUrl:url, youtubeId:null, duration:refFmt(N), TOTAL:N, aiEstimated:true };
+    const meta = { id:tempId, title:name, artist:'로컬 오디오 (자동 추정)', fileUrl:url, youtubeId:null, duration:refFmt(N), TOTAL:N };
     refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta);
     msg.textContent = '✓ ' + file.name + ' 구조 추정 완료!';
     msg.className = 'text-xs font-medium mt-2 text-primary';
@@ -2468,7 +2465,6 @@ function refBuildHarmonyAndFreq(songId){
 function refLoadPlayerUI(){
   document.getElementById('ref-song-title').textContent = refCurrentSong.title;
   document.getElementById('ref-song-artist').textContent = refCurrentSong.artist;
-  document.getElementById('ref-ai-disclaimer').classList.toggle('hidden', !refCurrentSong.aiEstimated);
   document.getElementById('ref-time-end').textContent = refCurrentSong.duration || '0:00';
   document.getElementById('ref-progress-inner').style.width = '0%';
   document.getElementById('ref-time').textContent = '0:00';
