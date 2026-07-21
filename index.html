@@ -368,6 +368,10 @@
 <footer>뮤박싱 · MUBAKSING — AI 음악 레퍼런스 분석 도구</footer>
 
 <script>
+  // 랜딩페이지에 머무는 동안 미리 백엔드를 깨워둬서, 이후 app.html에서
+  // 로그인할 때 Render 무료 플랜의 슬립/콜드스타트 지연을 겪지 않게 함
+  fetch('https://muboxing-backend.onrender.com/health').catch(() => {});
+
   const pages = Array.from(document.querySelectorAll('section[id^="p"]'));
   const navBtns = document.querySelectorAll('.page-nav button');
   const setActive = (id) => {

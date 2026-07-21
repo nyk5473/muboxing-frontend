@@ -1430,6 +1430,11 @@ const sideSongLabel = document.getElementById('side-song-label');
 /* ===================== Backend API / Auth ===================== */
 const API_BASE = 'https://muboxing-backend.onrender.com';
 
+// Render 무료 플랜은 일정 시간 요청이 없으면 백엔드가 슬립 상태로 전환되고,
+// 첫 요청에서 다시 깨어나는 데 수십 초가 걸려요. 로그인 버튼을 누르기 전에
+// 미리 깨워둬서 실제 로그인 시도가 타임아웃/재시도 없이 한 번에 되게 해요.
+fetch(API_BASE + '/health').catch(() => {});
+
 let currentUser = null;
 let authToken = localStorage.getItem('muboxing_token') || null;
 let authMode = 'login';
@@ -1501,12 +1506,21 @@ function setAuthTab(mode) {
   document.getElementById('auth-error').classList.add('hidden');
 }
 
+let authSubmitting = false;
+
 async function submitAuth() {
+  if (authSubmitting) return; // 백엔드가 깨어나는 동안 중복 클릭으로 요청이 여러 개 나가는 것을 막음
   const email = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value;
   const nickname = document.getElementById('auth-nickname').value.trim();
   const errBox = document.getElementById('auth-error');
+  const submitBtn = document.getElementById('auth-submit-btn');
   errBox.classList.add('hidden');
+
+  authSubmitting = true;
+  submitBtn.disabled = true;
+  const originalLabel = submitBtn.textContent;
+  submitBtn.textContent = '로그인 중... (서버를 깨우는 중이라 최대 1분 걸릴 수 있어요)';
 
   try {
     const path = authMode === 'register' ? '/auth/register' : '/auth/login';
@@ -1524,6 +1538,10 @@ async function submitAuth() {
   } catch (e) {
     errBox.textContent = e.message || '오류가 발생했어요.';
     errBox.classList.remove('hidden');
+  } finally {
+    authSubmitting = false;
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalLabel;
   }
 }
 
@@ -2123,6 +2141,9 @@ const ref_tracks_fmr = [
   { name:'FX', segs:[ {s:0,e:37,label:'시계소리/필터링 노이즈'},{s:62,e:73,label:'라이저'},{s:105,e:117,label:'보컬 초핑/글리치'},{s:161,e:192,label:'오케스트라 스웰'} ]},
 ];
 
+// 곡 id별 이어카피 퀴즈 데이터 (분석 결과에서 채워짐, refGetQuizChords()가 읽음)
+let refQuizData = {};
+
 const REF_SONGS_DB = {
   and_july: { TOTAL: 229, sections: ref_sections_and_july, tracks: ref_tracks_and_july },
   paradise: { TOTAL: 302, sections: ref_sections_paradise, tracks: ref_tracks_paradise },
@@ -2178,6 +2199,8 @@ const REF_QUIZ = {
   ],
 };
 
+Object.assign(refQuizData, REF_QUIZ); // and_july/paradise/feel_my_rhythm 데모곡 시드값
+
 let refTOTAL = 229, refSections = ref_sections_and_july, refTracks = ref_tracks_and_july;
 let refTracksBasic = refTracks.filter(t => t.name !== 'Chords');
 let refCurrentSong = null, refSelectedVersion = null;
@@ -2205,6 +2228,7 @@ function refLoadCustomSongs(){
     keys.forEach(key => {
       REF_SONGS_DB[key] = parsed[key].data;
       REF_HARMONY[key] = parsed[key].harmony;
+      refQuizData[key] = parsed[key].quiz || [];
       const btn = document.createElement('button');
       btn.className = 'preset-btn flex items-center gap-4 p-4 border-b border-white/10 last:border-b-0 hover:bg-white/10 transition-colors text-left';
       btn.onclick = () => { refCurrentSong = parsed[key].meta; refOpenSong(key); };
@@ -2221,12 +2245,12 @@ function refClearCustomSongs(){
   refLoadCustomSongs();
 }
 
-function refSaveCustomSong(id, data, harmony, meta){
-  REF_SONGS_DB[id] = data; REF_HARMONY[id] = harmony;
+function refSaveCustomSong(id, data, harmony, meta, quiz){
+  REF_SONGS_DB[id] = data; REF_HARMONY[id] = harmony; refQuizData[id] = quiz || [];
   const storageMeta = { ...meta, fileUrl: null };
   let saved = localStorage.getItem('muboxing_ref_custom');
   let parsed = saved ? JSON.parse(saved) : {};
-  parsed[id] = { data, harmony, meta: storageMeta };
+  parsed[id] = { data, harmony, quiz: quiz || [], meta: storageMeta };
   localStorage.setItem('muboxing_ref_custom', JSON.stringify(parsed));
   refLoadCustomSongs();
 }
@@ -2261,9 +2285,22 @@ function refGenerateAutoAnalysis(N){
     topHarm.push({s:s.start,e:s.end,label:'벌스 진행 추정'});
     if (s.label.includes('Chorus')) bottomHarm.push({s:s.start,e:s.end,label:'코러스 변화 감지'});
   });
+
+  // AI 분석이 없을 때(파일 업로드, 또는 분석 실패 폴백) 임시로 보여줄 자리표시자 퀴즈
+  const quizRoots = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+  const quizQualities = ['maj', 'min', 'dom', 'min'];
+  const quiz = secs.map((s, i) => ({
+    time: refFmt(s.start) + '~' + refFmt(s.end),
+    section: s.label,
+    root: quizRoots[i % quizRoots.length],
+    quality: quizQualities[i % quizQualities.length],
+    chordName: quizRoots[i % quizRoots.length] + (quizQualities[i % quizQualities.length] === 'min' ? 'm' : ''),
+  }));
+
   return {
     data: { TOTAL:N, sections:secs, tracks },
     harmony: { top:topHarm, bottom:bottomHarm, freq:freqMap, noteText:'일반적인 곡 구조 패턴을 기반으로 한 추정 구조예요. 실제 AI 분석이 아니라 참고용 초안입니다.' },
+    quiz,
   };
 }
 
@@ -2294,7 +2331,7 @@ async function refLoadFromUrl(){
       method: 'POST',
       body: JSON.stringify({ title, artist, composer: '', duration: N }),
     });
-    analysis = { data: result.data, harmony: result.harmony };
+    analysis = { data: result.data, harmony: result.harmony, quiz: result.quiz || [] };
     msg.textContent = '✓ AI 분석 완료! 목록에서 바로 열립니다.';
     msg.className = 'text-xs font-medium mb-6 text-primary';
   } catch (e) {
@@ -2303,7 +2340,7 @@ async function refLoadFromUrl(){
     msg.className = 'text-xs font-medium mb-6 text-kitsch-red';
   }
 
-  refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta);
+  refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta, analysis.quiz);
   refCurrentSong = meta;
   setTimeout(() => refOpenSong(tempId), 600);
 }
@@ -2327,7 +2364,7 @@ function refHandleFile(file){
     const tempId = 'ref_file_' + Date.now();
     const analysis = refGenerateAutoAnalysis(N);
     const meta = { id:tempId, title:name, artist:'로컬 오디오 (자동 추정)', fileUrl:url, youtubeId:null, duration:refFmt(N), TOTAL:N };
-    refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta);
+    refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta, analysis.quiz);
     msg.textContent = '✓ ' + file.name + ' 구조 추정 완료!';
     msg.className = 'text-xs font-medium mt-2 text-primary';
     refCurrentSong = meta;
@@ -2661,7 +2698,10 @@ const REF_QUALITIES = [ {id:'maj',label:'메이저 (Major/maj7)'}, {id:'min',lab
 let refChordIdx = 0, refRootAnswer = null, refQualityAnswer = null, refEarcopyScore = 0;
 const refEarcopyResults = [];
 
-function refGetQuizChords(){ return REF_QUIZ[refCurrentSong?.id] || REF_QUIZ.and_july; }
+function refGetQuizChords(){
+  const chords = refQuizData[refCurrentSong?.id];
+  return (chords && chords.length) ? chords : REF_QUIZ.and_july;
+}
 
 function refLoadChord(){
   const chords = refGetQuizChords();
