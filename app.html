@@ -1441,7 +1441,9 @@ let authMode = 'login';
 let pendingNextStep = null;
 
 async function authFetch(path, options = {}) {
-  const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+  // FormData(파일 업로드) 요청은 Content-Type을 브라우저가 boundary와 함께 자동 설정해야 하므로 강제하지 않음
+  const isFormData = (typeof FormData !== 'undefined') && (options.body instanceof FormData);
+  const headers = Object.assign(isFormData ? {} : { 'Content-Type': 'application/json' }, options.headers || {});
   if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
   const res = await fetch(API_BASE + path, Object.assign({}, options, { headers }));
   if (!res.ok) {
@@ -2318,31 +2320,34 @@ async function refLoadFromUrl(){
   if (!videoId){ msg.textContent = '유튜브 링크나 videoId가 올바르지 않아요.'; msg.className = 'text-xs font-medium mb-6 text-kitsch-red'; return; }
   const title = document.getElementById('ref-url-title').value.trim() || '제목 미상';
   const artist = document.getElementById('ref-url-artist').value.trim() || '아티스트 미상';
-  const N = 210;
+  const N = 210; // 실제 길이는 아래 분석 결과로 갱신됨
   const tempId = 'ref_custom_' + Date.now();
   const meta = { id:tempId, title, artist, youtubeId:videoId, duration:refFmt(N), TOTAL:N };
 
-  msg.textContent = '✨ AI가 "' + title + '" 구조를 분석하는 중...';
+  // 1) 즉시 기본 구조로 로드 — 실제 음원 분석(다운로드+DSP)은 느릴 수 있어서 기다리지 않음
+  const instant = refGenerateAutoAnalysis(N);
+  refSaveCustomSong(tempId, instant.data, instant.harmony, meta, instant.quiz);
+  refCurrentSong = meta;
+  msg.textContent = '✓ 곡이 로드됐어요! 실제 음원을 분석하는 중...';
   msg.className = 'text-xs font-medium mb-6 text-primary';
+  setTimeout(() => refOpenSong(tempId), 600);
 
-  let analysis;
+  // 2) 백그라운드에서 실제 오디오 분석 시도 → 성공하면 재생바/구간을 실제 곡에 맞게 조용히 업데이트
   try {
     const result = await authFetch('/ai/analyze-reference', {
       method: 'POST',
-      body: JSON.stringify({ title, artist, composer: '', duration: N }),
+      body: JSON.stringify({ title, artist, composer: '', duration: N, video_id: videoId }),
     });
-    analysis = { data: result.data, harmony: result.harmony, quiz: result.quiz || [] };
-    msg.textContent = '✓ AI 분석 완료! 목록에서 바로 열립니다.';
+    const analysis = { data: result.data, harmony: result.harmony, quiz: result.quiz || [] };
+    const updatedMeta = { ...meta, TOTAL: analysis.data.TOTAL, duration: refFmt(analysis.data.TOTAL) };
+    refSaveCustomSong(tempId, analysis.data, analysis.harmony, updatedMeta, analysis.quiz);
+    refRefreshIfViewing(tempId, updatedMeta);
+    msg.textContent = '✨ 실제 음원 분석으로 업데이트됐어요!';
     msg.className = 'text-xs font-medium mb-6 text-primary';
   } catch (e) {
-    analysis = refGenerateAutoAnalysis(N);
-    msg.textContent = '⚠ AI 분석에 실패해서 일반적인 구조로 대신 채웠어요 (' + e.message + ')';
+    msg.textContent = '⚠ 실제 분석에 실패해서 일반적인 구조를 그대로 써요 (' + e.message + ')';
     msg.className = 'text-xs font-medium mb-6 text-kitsch-red';
   }
-
-  refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta, analysis.quiz);
-  refCurrentSong = meta;
-  setTimeout(() => refOpenSong(tempId), 600);
 }
 
 document.getElementById('ref-upload-zone').addEventListener('click', () => document.getElementById('ref-file-input').click());
@@ -2359,16 +2364,34 @@ function refHandleFile(file){
   msg.textContent = '파일 길이를 확인하는 중...';
   msg.className = 'text-xs font-medium mt-2 text-on-surface-variant';
   const audio = new Audio(url);
-  audio.onloadedmetadata = () => {
+  audio.onloadedmetadata = async () => {
     const N = Math.floor(audio.duration);
     const tempId = 'ref_file_' + Date.now();
-    const analysis = refGenerateAutoAnalysis(N);
-    const meta = { id:tempId, title:name, artist:'로컬 오디오 (자동 추정)', fileUrl:url, youtubeId:null, duration:refFmt(N), TOTAL:N };
-    refSaveCustomSong(tempId, analysis.data, analysis.harmony, meta, analysis.quiz);
-    msg.textContent = '✓ ' + file.name + ' 구조 추정 완료!';
+
+    // 1) 즉시 기본 구조로 로드 — 실제 음원 분석은 느릴 수 있어서 기다리지 않음
+    const instant = refGenerateAutoAnalysis(N);
+    const meta = { id:tempId, title:name, artist:'로컬 오디오 (분석 중)', fileUrl:url, youtubeId:null, duration:refFmt(N), TOTAL:N };
+    refSaveCustomSong(tempId, instant.data, instant.harmony, meta, instant.quiz);
+    msg.textContent = '✓ ' + file.name + ' 로드됐어요! 실제 음원을 분석하는 중...';
     msg.className = 'text-xs font-medium mt-2 text-primary';
     refCurrentSong = meta;
     setTimeout(() => refOpenSong(tempId), 600);
+
+    // 2) 백그라운드에서 실제 오디오 분석 시도 → 성공하면 재생바/구간을 실제 곡에 맞게 조용히 업데이트
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const result = await authFetch('/ai/analyze-reference-upload', { method: 'POST', body: form });
+      const analysis = { data: result.data, harmony: result.harmony, quiz: result.quiz || [] };
+      const updatedMeta = { ...meta, artist: '로컬 오디오 (분석 완료)', TOTAL: analysis.data.TOTAL, duration: refFmt(analysis.data.TOTAL) };
+      refSaveCustomSong(tempId, analysis.data, analysis.harmony, updatedMeta, analysis.quiz);
+      refRefreshIfViewing(tempId, updatedMeta);
+      msg.textContent = '✨ 실제 음원 분석으로 업데이트됐어요!';
+      msg.className = 'text-xs font-medium mt-2 text-primary';
+    } catch (e) {
+      msg.textContent = '⚠ 실제 분석에 실패해서 일반적인 구조를 그대로 써요 (' + e.message + ')';
+      msg.className = 'text-xs font-medium mt-2 text-kitsch-red';
+    }
   };
   audio.onerror = () => { msg.textContent = '파일을 읽을 수 없어요.'; msg.className = 'text-xs font-medium mt-2 text-kitsch-red'; };
 }
@@ -2410,6 +2433,13 @@ function refSelectVersion(ver){
   refShowStage('player');
   refSwitchVersion(ver);
   refSetupMedia();
+}
+
+// 백그라운드 실제 오디오 분석이 끝난 뒤, 사용자가 아직 그 곡을 보고 있으면 화면을 조용히 갱신
+function refRefreshIfViewing(songId, updatedMeta){
+  if (!refCurrentSong || refCurrentSong.id !== songId) return;
+  if (updatedMeta) Object.assign(refCurrentSong, updatedMeta);
+  if (REF_SONGS_DB[songId]) refSetSongData(songId);
 }
 
 function refSetSongData(songId){
